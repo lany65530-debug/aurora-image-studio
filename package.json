@@ -1,0 +1,87 @@
+{
+  "name": "aurora-image-studio-v2",
+  "version": "1.0.1",
+  "description": "极光工作室 - 基于 gpt-image-2 的桌面端 AI 图片生成软件（v2 模块化重构）",
+  "main": "./out/main/index.js",
+  "author": "Aurora Studio",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_GITHUB_NAME/aurora-image-studio.git"
+  },
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite preview",
+    "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
+    "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
+    "typecheck": "npm run typecheck:node && npm run typecheck:web",
+    "pack:win": "electron-vite build && electron-builder --win --dir",
+    "dist:win": "electron-vite build && electron-builder --win",
+    "release:win": "electron-vite build && electron-builder --win --publish always",
+    "connect:github": "node scripts/connect-github.cjs",
+    "icon": "node scripts/gen-icon.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3",
+    "electron-vite": "^2.3.0",
+    "typescript": "^5.4.5",
+    "vite": "^4.5.0"
+  },
+  "build": {
+    "appId": "com.aurora.imagestudio",
+    "productName": "极光工作室",
+    "directories": {
+      "output": "release"
+    },
+    "artifactName": "AuroraStudio-Setup-${version}.${ext}",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "YOUR_GITHUB_NAME",
+        "repo": "aurora-image-studio",
+        "releaseType": "release"
+      }
+    ],
+    "files": [
+      "out/**/*",
+      "resources/**/*",
+      "build/icon.ico"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "极光工作室",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico"
+    },
+    "extraResources": [
+      {
+        "from": "resources/ffmpeg",
+        "to": "ffmpeg",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ]
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.9"
+  }
+}

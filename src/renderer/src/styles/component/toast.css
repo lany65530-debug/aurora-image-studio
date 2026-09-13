@@ -1,0 +1,30 @@
+/* ---------- Toast（统一右上角，避免遮挡中部视野） ---------- */
+.toast-wrap {
+  position: fixed;
+  top: 56px; right: 18px;
+  left: auto; bottom: auto;
+  transform: none;
+  z-index: 200;
+  display: flex; flex-direction: column; gap: 8px;
+  align-items: flex-end;
+  max-width: min(420px, calc(100vw - 36px));
+  pointer-events: none;
+}
+.toast {
+  max-width: 100%;
+  padding: 12px 18px;
+  background: var(--ink);
+  color: #fff; font-size: 13.5px; font-weight: 500;
+  border-radius: 12px; box-shadow: var(--shadow-lg);
+  display: flex; align-items: center; gap: 9px;
+  word-break: break-word;
+  pointer-events: auto;
+  animation: toastIn 0.25s var(--ease);
+}
+.toast.out { animation: toastOut 0.25s var(--ease) forwards; }
+.toast.error { background: #c62a20; }
+.toast.success { background: #0a7d43; }
+.toast.warn { background: #b7791f; }
+.toast .t-dot { width: 7px; height: 7px; flex-shrink: 0; border-radius: 50%; background: currentColor; }
+@keyframes toastIn { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
+@keyframes toastOut { to { opacity: 0; transform: translateX(14px); } }

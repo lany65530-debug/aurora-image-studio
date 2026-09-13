@@ -1,0 +1,323 @@
+/* ============================================================
+   多工作区（Workspaces）
+   ============================================================ */
+
+/* ---------- 侧边栏：工作区列表 ---------- */
+/* nav 占据剩余高度，工作区多时列表内部滚动，作品集固定在底部 */
+.nav { flex: 1; min-height: 0; }
+.nav #galleryNav { flex-shrink: 0; }
+.ws-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-height: 0;              /* 允许在 flex 布局中收缩滚动 */
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 2px;
+}
+
+/* ---------- 侧边栏：展开 / 收起 + 搜索 ---------- */
+.sidebar { transition: width 0.18s var(--ease); }
+.sidebar:not(.collapsed) { width: 228px; }
+.sidebar-head { display: flex; align-items: center; gap: 8px; padding-bottom: 2px; }
+.sidebar.collapsed .sidebar-head { justify-content: center; }
+.sidebar-title {
+  font-size: 12px; font-weight: 600; letter-spacing: 0.5px;
+  color: var(--ink-faint); white-space: nowrap;
+}
+.sidebar.collapsed .sidebar-title { display: none; }
+.sidebar-toggle {
+  flex-shrink: 0;
+  width: 30px; height: 30px;
+  display: grid; place-items: center;
+  border: none; background: transparent;
+  color: var(--ink-faint);
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.sidebar-toggle:hover { color: var(--ink); background: var(--surface-3); }
+.sidebar-toggle svg { transition: transform 0.18s var(--ease); }
+.sidebar:not(.collapsed) .sidebar-toggle svg { transform: rotate(180deg); }
+
+.ws-search-wrap {
+  display: flex; align-items: center; gap: 7px;
+  height: 32px; padding: 0 9px;
+  border-radius: 9px;
+  background: var(--surface-2);
+  color: var(--ink-faint);
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.ws-search-wrap:focus-within { background: var(--surface); box-shadow: inset 0 0 0 1.5px var(--line-strong); }
+.ws-search-wrap svg { flex-shrink: 0; }
+.ws-search {
+  flex: 1; min-width: 0;
+  border: none; outline: none; background: transparent;
+  font-family: var(--font-body); font-size: 13px;
+  color: var(--ink);
+}
+.ws-search::placeholder { color: var(--ink-faint); }
+.ws-search::-webkit-search-cancel-button { cursor: pointer; }
+.sidebar.collapsed .ws-search-wrap { display: none; }
+
+/* 展开态：名称与类型标签始终可见（同时覆盖窄屏的 .nav-item span 隐藏规则） */
+.sidebar:not(.collapsed) .nav-item span { display: inline; }
+.sidebar:not(.collapsed) .ws-item .ws-text { display: flex; }
+.sidebar:not(.collapsed) .ws-item .ws-name,
+.sidebar:not(.collapsed) .ws-item .ws-type { display: block; }
+
+/* 工作区条目（复用 .nav-item 基础样式，此处补充头像/名称/删除布局） */
+.ws-item { gap: 10px; padding: 8px 10px; }
+.ws-item { touch-action: pan-y; user-select: none; }
+.ws-item img { -webkit-user-drag: none; }
+.ws-reordering .ws-item { cursor: grabbing; }
+.ws-reordering .ws-item.ws-dragging { background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line-strong); opacity: .65; }
+.ws-reordering .ws-dragging .ws-avatar { transform: scale(1.1); }
+.ws-reorder-active, .ws-reorder-active * { cursor: grabbing !important; }
+.ws-reordering .ws-del { visibility: hidden; }
+.ws-reordering [data-tip]::after, .ws-reordering [data-tip]::before { display: none !important; }
+
+/* 名称 + 类型副标题 */
+.ws-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex; flex-direction: column; gap: 1px;
+  text-align: left;
+}
+.ws-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+.ws-type { font-size: 11px; line-height: 1.2; color: var(--ink-faint); }
+
+/* 头像：专属配色 + 名称首字母 / 自定义图标 + 类型角标
+   三种类型外形区分：图片=圆角方块，聊天=圆形，小说=书脊 */
+.ws-avatar {
+  position: relative;
+  flex-shrink: 0;
+  width: 28px; height: 28px;
+  border-radius: 9px;
+  display: grid; place-items: center;
+  background: var(--ws-bg, var(--ink));
+  color: var(--ws-fg, #fff);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  overflow: visible;
+  transition: border-radius 0.15s;
+}
+.ws-avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: inherit;
+}
+
+/* 类型角标：实心底 + 白图标 + 白色描边环，收起状态也清晰可辨 */
+.ws-type-badge {
+  position: absolute; right: -4px; bottom: -4px;
+  width: 18px; height: 18px;
+  display: grid; place-items: center;
+  border-radius: 6px;
+  background: var(--ws-fg, var(--ink));
+  color: #fff;
+  box-shadow: 0 0 0 2px var(--surface);
+  font-style: normal;
+  z-index: 3;
+}
+.ws-type-badge svg { width: 11px; height: 11px; }
+
+/* 聊天：圆形头像 + 专属配色，角标同步变圆 */
+.ws-avatar.chat {
+  background: var(--ws-bg, var(--surface-2));
+  color: var(--ws-fg, var(--ink));
+  box-shadow: inset 0 0 0 1px var(--ws-line, var(--line-strong));
+  border-radius: 50%;
+}
+.ws-avatar.chat .ws-type-badge { border-radius: 50%; }
+
+/* 小说：竖向书形 —— 更窄更高 + 左侧书脊 + 右侧大圆角，与图片 / 聊天一眼区分 */
+.ws-avatar.novel {
+  width: 24px; height: 30px;
+  border-radius: 3px 11px 11px 3px;
+}
+.ws-avatar.novel::before {
+  content: '';
+  position: absolute;
+  left: 1px; top: 14%; bottom: 14%;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--ws-fg, #fff);
+  opacity: 0.6;
+  z-index: 2;
+}
+
+/* 过滤无结果提示 */
+.ws-empty {
+  padding: 14px 10px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  text-align: center;
+  color: var(--ink-faint);
+  word-break: break-all;
+}
+.sidebar.collapsed .ws-empty { display: none; }
+
+/* 弹窗中的大号图标预览 */
+.ws-avatar.lg {
+  width: 48px; height: 48px;
+  border-radius: 13px;
+  font-size: 19px;
+}
+.ws-avatar.lg.chat { border-radius: 50%; }
+
+/* ---------- 新建图片工作区：生图引擎选择卡片 ---------- */
+.ws-engine-row { display: flex; gap: 10px; }
+.ws-engine-card {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 3px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+}
+.ws-engine-card:hover { border-color: var(--ink-faint); }
+.ws-engine-card.selected { border-color: var(--ink); background: var(--surface-2); }
+.ws-engine-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+.ws-engine-desc { font-size: 12px; color: var(--ink-faint); }
+
+/* 悬停显示的删除按钮 */
+.ws-del {
+  flex-shrink: 0;
+  width: 22px; height: 22px;
+  display: grid; place-items: center;
+  border-radius: 6px;
+  color: var(--ink-faint);
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s, background 0.15s;
+}
+.ws-item:hover .ws-del { opacity: 1; }
+.ws-del:hover { color: #e02e24; background: rgba(224,46,36,0.1); }
+
+/* 折叠态：头像恢复显示（覆盖 .nav-item span 隐藏规则），删除按钮隐藏 */
+.sidebar.collapsed .ws-item .ws-avatar { display: grid; }
+.sidebar.collapsed .ws-item .ws-del { display: none; }
+.sidebar.collapsed .ws-item { padding: 8px 0; gap: 0; }
+/* 折叠态空间有限，但仍保留足够大的角标，保证图标轨也能分辨类型 */
+.sidebar.collapsed .ws-item .ws-type-badge { width: 16px; height: 16px; right: -3px; bottom: -3px; }
+.sidebar.collapsed .ws-item .ws-type-badge svg { width: 10px; height: 10px; }
+
+/* ---------- 侧边栏底部：新建工作区 ---------- */
+.sidebar-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  min-height: 0;
+}
+.ws-add {
+  display: flex; align-items: center; gap: 9px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none; background: transparent;
+  color: var(--ink-faint);
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+  transition: background 0.15s, color 0.15s;
+}
+.ws-add svg { flex-shrink: 0; }
+.ws-add:hover { color: var(--ink); background: var(--surface-3); }
+
+/* 折叠态：新建按钮仅显示 + 号，悬停出 tooltip（与 nav-item 同款） */
+.sidebar.collapsed .ws-add { justify-content: center; padding: 10px 0; gap: 0; }
+.sidebar.collapsed .ws-add span { display: none; }
+.sidebar.collapsed .ws-add::after {
+  content: attr(data-tip);
+  position: absolute; left: calc(100% + 12px); top: 50%;
+  transform: translateY(-50%) translateX(-4px);
+  padding: 5px 10px;
+  border-radius: 7px;
+  background: var(--ink); color: #fff;
+  font-size: 12px; font-weight: 500; letter-spacing: 0.1px;
+  white-space: nowrap;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.15s, transform 0.15s;
+  z-index: 80;
+  box-shadow: var(--shadow-md);
+}
+.sidebar.collapsed .ws-add:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* 新建工作区一体按钮 + 选择菜单 */
+.ws-add-wrap { position: relative; }
+.ws-add-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  min-width: 172px;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  display: flex; flex-direction: column; gap: 2px;
+  z-index: 70;
+}
+.ws-add-menu[hidden] { display: none; }
+.ws-add-item {
+  display: flex; align-items: center; gap: 9px;
+  height: 34px; padding: 0 10px;
+  border: none; background: transparent;
+  border-radius: 8px;
+  color: var(--ink-soft);
+  font-family: var(--font-body);
+  font-size: 13px; font-weight: 500;
+  cursor: pointer; text-align: left;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+.ws-add-item svg { flex-shrink: 0; color: var(--ink-faint); }
+.ws-add-item:hover { color: var(--ink); background: var(--surface-3); }
+.ws-add-item:hover svg { color: var(--ink); }
+.global-tip {
+  position: fixed;
+  z-index: 9999;
+  padding: 5px 10px;
+  border-radius: 7px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  white-space: nowrap;
+  line-height: 1.4;
+  max-width: 340px;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(3px);
+  transition: opacity 0.15s, transform 0.15s, visibility 0.15s;
+  box-shadow: var(--shadow-md);
+}
+.global-tip.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}

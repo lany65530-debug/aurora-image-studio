@@ -1,0 +1,46 @@
+name: Release
+
+# 打一个形如 v1.0.21 的 tag 就会自动：构建 → 打包 NSIS 安装包 → 生成 blockmap → 发布到 GitHub Release
+# 客户端（安装版）启动后就会检测到这个新版本。
+on:
+  push:
+    tags:
+      - 'v*'
+
+# electron-builder 需要写 Release 的权限
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build & Publish to GitHub Release
+        env:
+          # electron-builder 用 GH_TOKEN 认领发布权限（默认 token 即可，无需自建）
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 下面两个可以留空；要跳过代码签名时显式声明一下，避免 CI 卡在找证书
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npm run release:win
+
+      - name: Upload build logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-output
+          path: |
+            release/*.yml
+            release/*.yaml
+          if-no-files-found: ignore

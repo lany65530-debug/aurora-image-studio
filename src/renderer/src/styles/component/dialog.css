@@ -1,0 +1,140 @@
+/* ---------- 创作视图：工作区设置齿轮（右上角浮动） ---------- */
+.ws-gear-btn {
+  position: absolute;
+  top: 24px; right: 30px;
+  z-index: 5;
+  width: 36px; height: 36px;
+  display: grid; place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-faint);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+}
+.ws-gear-btn:hover {
+  color: var(--ink);
+  background: var(--surface-2);
+  border-color: var(--line-strong);
+}
+.ws-gear-btn:active { transform: scale(0.94); }
+/* 齿轮旋转动效 */
+.ws-gear-btn svg { transition: transform 0.35s var(--ease); }
+.ws-gear-btn:hover svg { transform: rotate(60deg); }
+
+/* ---------- 通用弹窗（工作区设置 / 新建工作区） ---------- */
+.modal-overlay {
+  position: fixed; inset: 0;
+  display: grid; place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.32);
+  z-index: 150;                 /* lightbox(100) 之上、toast(200) 之下 */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+.modal-card {
+  width: min(600px, 100%);
+  max-height: min(86vh, 780px);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  transform: translateY(14px) scale(0.985);
+  transition: transform 0.22s var(--ease);
+}
+.modal-overlay.open .modal-card { transform: none; }
+.modal-card.narrow { width: min(440px, 100%); }
+
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  padding: 20px 22px 12px;
+  flex-shrink: 0;
+}.modal-head h3 {
+  font-size: 16.5px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.modal-title {
+  display: flex; align-items: center; gap: 8px;
+  min-width: 0;
+}
+.modal-title svg { flex-shrink: 0; }
+
+/* 删除工作区确认弹窗 */
+.modal-close {
+  flex-shrink: 0;
+  width: 30px; height: 30px;
+  display: grid; place-items: center;
+  border: none; border-radius: 9px;
+  background: transparent;
+  color: var(--ink-faint);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.modal-close:hover { background: var(--surface-3); color: var(--ink); }
+
+/* 删除工作区确认弹窗 */
+.confirm-card { width: min(380px, 100%); }
+.confirm-card .modal-title svg { flex-shrink: 0; color: #d3352b; }
+.confirm-body { padding-top: 4px; gap: 18px; }
+.confirm-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  white-space: pre-line;
+  margin: 0;
+}
+.confirm-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 2px; }
+.primary-btn.danger-btn { background: #d3352b; }
+.primary-btn.danger-btn:hover { background: #b92a21; opacity: 1; }
+
+.modal-body {
+  padding: 6px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+/* ---------- 弹窗内：名称 + 图标行 ---------- */
+.ws-modal-idrow {
+  display: flex; align-items: center; gap: 16px;
+  padding-bottom: 4px;
+}
+.ws-icon-edit {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  flex-shrink: 0;
+}
+.ws-icon-btns { display: flex; gap: 6px; }
+.ws-name-field { flex: 1; min-width: 0; }
+
+/* 工作区专属区块（图片 / 聊天），由 JS 控制显隐 */
+.ws-only {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line);
+}
+
+/* 弹窗内多行文本 */
+.ws-textarea {
+  resize: vertical;
+  min-height: 72px;
+  line-height: 1.55;
+  font-family: var(--font-body);
+}
+
+/* ---------- 旧类名兼容 ---------- */
+.aurora-bg, .blob, .grain { display: none; }

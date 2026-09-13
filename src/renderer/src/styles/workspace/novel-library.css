@@ -1,0 +1,388 @@
+/* ============================================================
+   小说工作区 · 作品库（`.folio`）
+   ------------------------------------------------------------
+   与图片/对话工作区使用同一套 token：白底、--line 分隔、胶囊按钮、
+   10-14px 圆角、系统无衬线字体；绿色/石板色已全部移除。
+   ============================================================ */
+
+.folio {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  color: var(--ink);
+  background: var(--bg);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.folio *,
+.folio *::before,
+.folio *::after { box-sizing: border-box; }
+.folio h1,
+.folio h2,
+.folio h3,
+.folio p,
+.folio dl,
+.folio dd { margin: 0; }
+.folio button,
+.folio input,
+.folio select { font: inherit; }
+.folio button { cursor: pointer; }
+.folio button:focus-visible,
+.folio article:focus-visible,
+.folio input:focus-visible,
+.folio select:focus-visible { outline: 2px solid rgba(0, 0, 0, 0.35); outline-offset: 2px; }
+
+/* ---------- 头部：与 chat/image 的 56px 头部一致 ---------- */
+.folio-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 56px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+.folio-brand { display: flex; align-items: center; gap: 10px; min-width: 0; color: var(--ink); }
+.folio-brand h1 { font-size: 14px; font-weight: 600; white-space: nowrap; }
+.folio-header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* ---------- 按钮：与全局 ghost/primary 胶囊按钮同一套语言 ---------- */
+.folio-button,
+.folio-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  flex-shrink: 0;
+  min-height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.folio-button:hover { border-color: rgba(0, 0, 0, 0.3); color: var(--ink); }
+.folio-button.folio-primary { border-color: var(--ink); background: var(--ink); color: #fff; }
+.folio-button.folio-primary:hover { border-color: #2a2a2a; background: #2a2a2a; color: #fff; }
+.folio-button.folio-quiet { border-color: transparent; background: transparent; color: var(--ink-soft); }
+.folio-button.folio-quiet:hover { background: var(--surface-2); color: var(--ink); }
+.folio-icon {
+  width: 34px;
+  min-height: 34px;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--ink-faint);
+}
+.folio-icon:hover { background: var(--surface-2); color: var(--ink); }
+
+/* ---------- 滚动区与内容网格 ---------- */
+.folio-scroll { flex: 1; min-height: 0; overflow: auto; background: var(--bg); }
+.folio-inner { max-width: 1280px; margin: 0 auto; padding: 24px 32px 48px; }
+
+.folio-resume {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px;
+  align-items: center;
+  gap: 48px;
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+.folio-eyebrow { display: flex; align-items: center; gap: 8px; color: var(--ink-faint); font-size: 11.5px; }
+.folio-dot { width: 6px; height: 6px; border-radius: 50%; background: #0a7d43; }
+.folio-eyebrow time { margin-left: 4px; color: var(--ink-faint); }
+.folio-resume h2 {
+  margin-top: 10px;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.folio-resume-chapter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px !important;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+}
+.folio-excerpt {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-top: 10px !important;
+  max-width: 620px;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+.folio-resume-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.folio-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-left: 26px;
+  border-left: 1px solid var(--line);
+}
+.folio-stats > div { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.folio-stats dt { color: var(--ink-faint); font-size: 11.5px; white-space: nowrap; }
+.folio-stats dd { color: var(--ink); font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.folio-stats small { margin-left: 4px; color: var(--ink-faint); font-size: 11px; font-weight: 400; }
+
+.folio-content { display: grid; grid-template-columns: minmax(0, 1fr) 248px; gap: 28px; padding-top: 24px; }
+.folio-collection,
+.folio-recent { min-width: 0; }
+.folio-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 34px; }
+.folio-section-heading h2 { font-size: 13.5px; font-weight: 600; }
+.folio-section-heading h2 > span { margin-left: 6px; color: var(--ink-faint); font-size: 11.5px; font-weight: 400; }
+.folio-layout {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+.folio-layout button {
+  width: 28px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-faint);
+}
+.folio-layout button.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm); }
+.folio-filters { display: flex; gap: 8px; margin: 14px 0 18px; }
+.folio-search {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink-faint);
+}
+.folio-search input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 12.5px; }
+.folio-search:focus-within { border-color: rgba(0, 0, 0, 0.35); }
+.folio-search input::placeholder { color: var(--ink-faint); }
+.folio-filters select {
+  max-width: 132px;
+  padding: 0 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-size: 12.5px;
+}
+
+/* ---------- 作品卡片 ---------- */
+.folio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.folio .folio-work {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.folio .folio-work[hidden] { display: none; }
+.folio .folio-work:hover { border-color: var(--line-strong); box-shadow: var(--shadow-md); }
+.folio-work-body { display: flex; align-items: flex-start; gap: 16px; padding: 18px; min-width: 0; }
+.folio-cover {
+  position: relative;
+  width: 78px;
+  aspect-ratio: 2 / 3;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 9px;
+  border-radius: 4px 8px 8px 4px;
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  text-align: center;
+  box-shadow: inset 3px 0 rgba(255, 255, 255, 0.13), inset 5px 0 rgba(0, 0, 0, 0.09), 2px 3px 8px rgba(0, 0, 0, 0.12);
+}
+.folio-cover > span { font-size: 9px; opacity: 0.6; }
+.folio-cover > strong {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-family: 'Songti SC', 'SimSun', serif;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.folio-cover > small { font-size: 9px; opacity: 0.7; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.folio-cover-edit {
+  position: absolute;
+  inset: auto 6px 6px auto;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.folio-cover:hover .folio-cover-edit,
+.folio-cover:focus-within .folio-cover-edit { opacity: 1; }
+.folio-work-copy { min-width: 0; flex: 1; }
+.folio-work-label { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 22px; }
+.folio-work-label > span { color: var(--ink-faint); font-size: 11px; }
+.folio-work-label > button { width: 26px; min-height: 26px; color: var(--ink-faint); }
+.folio-work-label > button:hover { color: #c62a20; background: rgba(198, 42, 32, 0.08); }
+.folio-work-copy h3 {
+  margin-top: 2px;
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.6;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.folio-author { display: block; margin-top: 4px; color: var(--ink-faint); font-size: 11.5px; }
+.folio-work-copy p {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 44px;
+  margin-top: 10px !important;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+.folio-work-count { display: flex; align-items: center; gap: 6px; margin-top: 10px; color: var(--ink-faint); font-size: 11.5px; }
+.folio-work-count span { color: var(--accent-3); }
+.folio-work-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 18px;
+  border-top: 1px solid var(--line);
+  font-size: 11.5px;
+}
+.folio-work-footer time { color: var(--ink-faint); }
+.folio-work-footer > span { display: flex; align-items: center; gap: 4px; color: var(--ink-soft); }
+
+.folio-grid.is-list { grid-template-columns: 1fr; }
+.folio-grid.is-list .folio-work { flex-direction: row; align-items: center; }
+.folio-grid.is-list .folio-work-body { flex: 1; align-items: center; padding: 14px 18px; }
+.folio-grid.is-list .folio-cover { width: 52px; padding: 6px; gap: 3px; }
+.folio-grid.is-list .folio-cover strong { font-size: 10px; }
+.folio-grid.is-list .folio-cover > span,
+.folio-grid.is-list .folio-cover small { display: none; }
+.folio-grid.is-list .folio-work-copy p { height: auto; -webkit-line-clamp: 1; margin-top: 4px !important; }
+.folio-grid.is-list .folio-work-count { margin-top: 4px; }
+.folio-grid.is-list .folio-work-footer { flex-shrink: 0; flex-direction: column; align-items: flex-end; border: 0; }
+
+/* ---------- 最近章节 ---------- */
+.folio-recent { padding-left: 24px; border-left: 1px solid var(--line); }
+.folio-recent .folio-section-heading > svg { color: var(--ink-faint); }
+.folio-recent-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-faint);
+  text-align: left;
+}
+.folio-recent-item > div { flex: 1; min-width: 0; }
+.folio-recent-number { color: var(--ink-faint); font-size: 11px; font-variant-numeric: tabular-nums; }
+.folio-recent-item strong {
+  display: block;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.folio-recent-item div > span { display: block; margin-top: 4px; overflow: hidden; color: var(--ink-soft); font-size: 11.5px; white-space: nowrap; text-overflow: ellipsis; }
+.folio-recent-item small { display: block; margin-top: 6px; color: var(--ink-faint); font-size: 11px; }
+.folio-recent-item > svg { margin-top: 4px; flex-shrink: 0; opacity: 0; transition: opacity 0.15s; }
+.folio-recent-item:hover strong { color: var(--ink); }
+.folio-recent-item:hover > svg,
+.folio-recent-item:focus-visible > svg { opacity: 1; }
+.folio-recent-empty { padding: 26px 0; color: var(--ink-faint); font-size: 12.5px; }
+
+/* ---------- 空状态（与作品集空状态一致） ---------- */
+.folio-no-results,
+.folio-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 48px 20px;
+  color: var(--ink-faint);
+  text-align: center;
+}
+.folio-no-results[hidden] { display: none; }
+.folio-empty > svg { color: var(--ink-faint); }
+.folio-no-results h3,
+.folio-empty h3 { color: var(--ink); font-size: 15px; font-weight: 600; }
+
+@media (min-width: 1500px) { .folio-inner { padding-left: 48px; padding-right: 48px; } }
+@media (max-width: 1100px) {
+  .folio-content { grid-template-columns: minmax(0, 1fr) 210px; gap: 22px; }
+  .folio-inner { padding: 20px 22px 36px; }
+  .folio-recent { padding-left: 18px; }
+  .folio-grid { grid-template-columns: 1fr; }
+  .folio-resume { gap: 28px; }
+}
+@media (max-width: 860px) {
+  .folio-content { grid-template-columns: 1fr; }
+  .folio-recent { padding: 20px 0 0; border-left: 0; border-top: 1px solid var(--line); }
+  .folio-header { flex-wrap: wrap; gap: 12px; }
+  .folio-resume { grid-template-columns: 1fr; gap: 20px; }
+  .folio-stats { flex-direction: row; justify-content: space-between; padding: 16px 0 0; border-left: 0; border-top: 1px solid var(--line); }
+  .folio-stats > div { flex-direction: column; gap: 2px; }
+}
+@media (max-width: 520px) {
+  .folio-inner { padding: 16px 16px 28px; }
+  .folio-header { padding: 12px 14px; }
+  .folio-header-actions { gap: 6px; }
+  .folio-header-actions .folio-button { padding: 0 10px; font-size: 11.5px; }
+  .folio-header-actions .folio-icon { width: 30px; }
+  .folio-resume { padding: 18px; }
+  .folio-resume h2 { font-size: 19px; }
+  .folio-work-body { padding: 14px; gap: 12px; }
+  .folio-grid.is-list .folio-work { flex-direction: column; align-items: stretch; }
+  .folio-grid.is-list .folio-work-footer { flex-direction: row; }
+  .folio-cover-edit { opacity: 1; }
+}

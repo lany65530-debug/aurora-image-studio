@@ -1,0 +1,42 @@
+/* ============================================================
+   Aurora Image Studio — ChatGPT 风格视觉语言
+   纯净白主区 / 浅灰侧栏 / 系统字体 / 黑色圆形发送键 / 无渐变
+   ============================================================ */
+:root {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f4f4f4;
+  --surface-3: #ececec;
+  --ink: #0d0d0d;
+  --ink-soft: #5d5d5d;
+  --ink-faint: #8f8f8f;
+  --line: #ececec;
+  --line-strong: rgba(0, 0, 0, 0.13);
+  --accent: #0d0d0d;
+  --accent-2: #5d5d5d;
+  --accent-3: #c9c9c9;
+  --accent-soft: rgba(0, 0, 0, 0.05);
+  --sidebar-bg: #ffffff;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.12);
+  --radius: 14px;
+  --radius-sm: 10px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --font-display: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Helvetica, Arial, sans-serif;
+  --font-body: var(--font-display);
+  --font-size-base: 14.5px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  color: var(--ink);
+  background: var(--bg);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}

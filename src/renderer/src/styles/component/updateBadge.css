@@ -1,0 +1,80 @@
+/* ============================================================
+   标题栏 · 自动更新入口
+   胶囊按钮：常态「检查更新」，发现新版本时高亮，下载时显示进度。
+   ============================================================ */
+.update-badge {
+  -webkit-app-region: no-drag;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 28px;
+  margin-right: 8px;
+  padding: 0 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.update-badge:hover { background: var(--surface-2); color: var(--ink); }
+.update-badge:disabled { cursor: default; }
+.update-badge[hidden] { display: none; }
+
+/* 下载进度条（底部 2px，scaleX 表示百分比） */
+.update-badge-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left center;
+  opacity: 0;
+  transition: transform 0.2s linear, opacity 0.2s;
+}
+.update-badge[data-state='downloading'] .update-badge-progress { opacity: 0.85; }
+
+.update-badge-dot {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-3);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+/* 有新版本 / 已就绪：琥珀色 */
+.update-badge[data-state='available'] .update-badge-dot,
+.update-badge[data-state='downloaded'] .update-badge-dot {
+  background: #e0a80a;
+  box-shadow: 0 0 0 3px rgba(224, 168, 10, 0.16);
+}
+/* 下载中：绿色 */
+.update-badge[data-state='downloading'] .update-badge-dot { background: #0a7d43; }
+/* 出错：红色 */
+.update-badge[data-state='error'] .update-badge-dot { background: #e02e24; }
+
+/* 检查中：呼吸 */
+.update-badge[data-state='checking'] .update-badge-dot {
+  animation: updateBadgePulse 1s ease-in-out infinite;
+}
+@keyframes updateBadgePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* 有新版本时轻微强调按钮 */
+.update-badge[data-state='available'],
+.update-badge[data-state='downloaded'] {
+  border-color: rgba(224, 168, 10, 0.5);
+  color: var(--ink);
+}
