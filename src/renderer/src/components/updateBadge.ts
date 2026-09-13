@@ -39,12 +39,14 @@ export function initUpdateBadge(): void {
 
   const render = (s: UpdaterStatus): void => {
     current = s
+    // 开发模式提示、以及后台自动检查的失败，都不在标题栏显示为红色故障（保持中性文案）
     const dev = isDevNotice(s)
-    const state = dev ? 'idle' : s.state
+    const silentError = s.state === 'error' && !s.manual
+    const state = dev || silentError ? 'idle' : s.state
     badge.dataset.state = state
 
     let text = '检查更新'
-    let title = '检查更新'
+    let title = silentError ? String(s.error || '') : '检查更新'
     switch (state) {
       case 'checking':
         text = '检查中…'
