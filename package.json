@@ -7,7 +7,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOUR_GITHUB_NAME/aurora-image-studio.git"
+    "url": "https://github.com/lany65530-debug/aurora-image-studio.git"
   },
   "scripts": {
     "dev": "electron-vite dev",
@@ -40,7 +40,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "YOUR_GITHUB_NAME",
+        "owner": "lany65530-debug",
         "repo": "aurora-image-studio",
         "releaseType": "release"
       }
