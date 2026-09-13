@@ -1,0 +1,467 @@
+/* ============================================================
+   六套主题 · 每套一套独立的视觉语言
+   ------------------------------------------------------------
+   本文件只做两件事：
+     1) 把组件里写死的「形状」重新指向圆角令牌（值与原样一致，默认主题零变化）
+     2) 用 [data-theme='x'] 覆盖 design token + 少量组件特有规则
+   主题由 <html data-theme="..."> 切换（见 state/ui.ts）。
+   ============================================================ */
+
+/* ============================================================
+   一、形状令牌映射
+   让「换主题」能整体改变圆角语言。取值与原组件一致，
+   因此默认主题（极简光感）在这段之后外观完全不变。
+   ============================================================ */
+.win-btn,
+.reveal-btn,
+.pop-model-search,
+.ws-add-item,
+.channel-item,
+.adv-section { border-radius: var(--radius-xs); }
+
+.progress-card,
+.ws-add-menu,
+.toast,
+.chat-new-btn,
+.img-card,
+.skeleton,
+.chat-msg-error,
+.dt-seg-score { border-radius: var(--radius-md); }
+
+.modal-card,
+.dt-modal-card,
+.chat-model-pop,
+.empty-mark,
+.chat-empty-icon { border-radius: var(--radius-lg); }
+
+.composer { border-radius: var(--radius-xl); }
+
+.update-badge,
+.primary-btn,
+.ghost-btn,
+.send-btn,
+.chat-send-btn,
+.chat-stop-btn,
+.chat-icon-btn,
+.chat-persona-btn,
+.chat-model-btn,
+.chat-fontsize,
+.chat-fontsize-btn,
+.chat-toggles,
+.chat-back-bottom,
+.chat-suggest-btn,
+.ws-gear-btn,
+.ws-add,
+.tool-pill,
+.feature-pill,
+.pop-opt,
+.channel-toggle,
+.channel-group-count,
+.ws-engine-card { border-radius: var(--radius-pill); }
+
+/* 小标签排印（终端主题会改成正体大写 + 字距） */
+.field-label,
+.sidebar-title,
+.pop-group-label,
+.discover-head,
+.hero-eyebrow,
+.btn,
+.settings-section-title,
+.theme-card-name { text-transform: var(--label-transform); letter-spacing: var(--label-tracking); }
+
+/* ============================================================
+   二、主题 1/6 · 极简光感 aurora（默认）
+   设计语言：白纸留白、中性灰阶、柔和投影、系统无衬线、大留白。
+   —— 令牌已在 tokens.css 中定义，这里只做显式声明，便于对照。
+   ============================================================ */
+[data-theme='aurora'] {
+  --label-transform: none;
+  --label-tracking: 0;
+  --panel-blur: none;
+}
+
+/* ============================================================
+   三、主题 2/6 · 终端磷光 terminal
+   设计语言：CRT 终端。近黑底 + 磷光绿、全等宽字、直角硬边、
+   1px 发光描边、扫描线纹理、信息密度优先。
+   ============================================================ */
+[data-theme='terminal'] {
+  --body-bg: #04070a;
+  --bg: #04070a;
+  --surface: #08100e;
+  --surface-2: #0c1916;
+  --surface-3: #12241d;
+  --ink: #c9ffe1;
+  --ink-soft: #74d59c;
+  --ink-faint: #478a68;
+  --line: rgba(0, 255, 136, 0.16);
+  --line-strong: rgba(0, 255, 136, 0.38);
+  --accent: #00ff88;
+  --accent-2: #00c46a;
+  --accent-3: #0d3b2a;
+  --accent-soft: rgba(0, 255, 136, 0.09);
+  --on-accent: #03130b;
+  --sidebar-bg: #060d0b;
+  --shadow-sm: 0 0 6px rgba(0, 255, 136, 0.14);
+  --shadow-md: 0 0 14px rgba(0, 255, 136, 0.18);
+  --shadow-lg: 0 0 34px rgba(0, 255, 136, 0.24);
+  --radius-xs: 1px;
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius: 2px;
+  --radius-lg: 3px;
+  --radius-xl: 4px;
+  --radius-pill: 2px;
+  --font-display: var(--font-mono);
+  --font-body: var(--font-mono);
+  --label-transform: uppercase;
+  --label-tracking: 0.12em;
+  --panel-blur: none;
+  --duration: 0.08s;
+}
+
+/* 扫描线 + 轻微暗角，营造 CRT 质感 */
+[data-theme='terminal'] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(to bottom, rgba(0, 255, 136, 0.045) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 90% at 50% 0%, transparent 55%, rgba(0, 0, 0, 0.45) 100%);
+}
+[data-theme='terminal'] .titlebar { border-bottom: 1px solid var(--line); }
+[data-theme='terminal'] .brand-mark { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+[data-theme='terminal'] .primary-btn {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+}
+[data-theme='terminal'] .ghost-btn { background: transparent; color: var(--ink-soft); }
+[data-theme='terminal'] .nav-item.active { border-left: 2px solid var(--accent); }
+[data-theme='terminal'] .composer,
+[data-theme='terminal'] .modal-card,
+[data-theme='terminal'] .pop,
+[data-theme='terminal'] .toast { box-shadow: 0 0 0 1px var(--line-strong), 0 0 24px rgba(0, 255, 136, 0.1); }
+
+/* ============================================================
+   四、主题 3/6 · 纸上书卷 paper
+   设计语言：纸张与编辑排版。米黄纸感、衬线正文、发丝线分隔、
+   零投影、几乎直角、朱砂红点缀，像一本印出来的书。
+   ============================================================ */
+[data-theme='paper'] {
+  --body-bg: #efe8da;
+  --bg: #faf6ec;
+  --surface: #fdfaf3;
+  --surface-2: #f2ebdc;
+  --surface-3: #e7ddc9;
+  --ink: #2a241b;
+  --ink-soft: #6a5e4c;
+  --ink-faint: #9b8f79;
+  --line: rgba(42, 36, 27, 0.15);
+  --line-strong: rgba(42, 36, 27, 0.34);
+  --accent: #9c3d2e;
+  --accent-2: #7b2e22;
+  --accent-3: #d8c7a8;
+  --accent-soft: rgba(156, 61, 46, 0.09);
+  --on-accent: #fbf8f0;
+  --sidebar-bg: #f3ecdc;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: 0 1px 0 rgba(42, 36, 27, 0.12);
+  --radius-xs: 1px;
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius: 3px;
+  --radius-lg: 3px;
+  --radius-xl: 4px;
+  --radius-pill: 2px;
+  --font-display: Georgia, 'Songti SC', 'Noto Serif SC', 'Source Han Serif SC', SimSun, serif;
+  --font-body: var(--font-display);
+  --label-transform: none;
+  --label-tracking: 0.08em;
+  --panel-blur: none;
+}
+
+/* 纸张纤维纹理 */
+[data-theme='paper'] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.5;
+  background:
+    repeating-linear-gradient(90deg, rgba(42, 36, 27, 0.022) 0 1px, transparent 1px 4px),
+    radial-gradient(130% 100% at 50% 0%, transparent 60%, rgba(120, 96, 62, 0.09) 100%);
+}
+[data-theme='paper'] .primary-btn {
+  border: 1px solid var(--accent-2);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--font-body);
+}
+[data-theme='paper'] .ghost-btn { background: transparent; }
+[data-theme='paper'] .titlebar { border-bottom: 1px solid var(--line); }
+[data-theme='paper'] .hero-title,
+[data-theme='paper'] .display-title { font-weight: 400; letter-spacing: -0.2px; }
+[data-theme='paper'] .composer,
+[data-theme='paper'] .modal-card,
+[data-theme='paper'] .pop { border: 1px solid var(--line-strong); }
+
+/* ============================================================
+   五、主题 4/6 · 柔和浮雕 neu
+   设计语言：新拟态（Neumorphism）。表面与底色同色，
+   靠一明一暗的双向柔和投影「挤」出体积；无描边、大圆角、低对比。
+   ============================================================ */
+[data-theme='neu'] {
+  --body-bg: #e7ecf3;
+  --bg: #e7ecf3;
+  --surface: #e7ecf3;
+  --surface-2: #e1e7f0;
+  --surface-3: #d7dfeb;
+  --ink: #44506b;
+  --ink-soft: #6d7a95;
+  --ink-faint: #97a3ba;
+  --line: rgba(255, 255, 255, 0.7);
+  --line-strong: rgba(255, 255, 255, 0.95);
+  --accent: #5b7cfa;
+  --accent-2: #4462d6;
+  --accent-3: #c2cbdd;
+  --accent-soft: rgba(91, 124, 250, 0.12);
+  --on-accent: #ffffff;
+  --sidebar-bg: #e7ecf3;
+  --shadow-sm: 2px 2px 5px rgba(163, 177, 198, 0.5), -2px -2px 5px rgba(255, 255, 255, 0.9);
+  --shadow-md: 6px 6px 14px rgba(163, 177, 198, 0.55), -6px -6px 14px rgba(255, 255, 255, 0.92);
+  --shadow-lg: 11px 11px 28px rgba(163, 177, 198, 0.6), -9px -9px 24px rgba(255, 255, 255, 0.95);
+  --radius-xs: 12px;
+  --radius-sm: 14px;
+  --radius-md: 18px;
+  --radius: 20px;
+  --radius-lg: 24px;
+  --radius-xl: 30px;
+  --radius-pill: 999px;
+  --label-transform: none;
+  --label-tracking: 0;
+  --panel-blur: none;
+}
+
+/* 输入类改为内凹，和凸起形成对比 */
+[data-theme='neu'] .text-input,
+[data-theme='neu'] .code-input,
+[data-theme='neu'] .composer,
+[data-theme='neu'] textarea {
+  border-color: transparent;
+  box-shadow: inset 3px 3px 7px rgba(163, 177, 198, 0.55), inset -3px -3px 7px rgba(255, 255, 255, 0.95);
+}
+[data-theme='neu'] .primary-btn {
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 4px 4px 10px rgba(91, 124, 250, 0.35), -3px -3px 9px rgba(255, 255, 255, 0.85);
+}
+[data-theme='neu'] .ghost-btn {
+  border-color: transparent;
+  box-shadow: 3px 3px 8px rgba(163, 177, 198, 0.5), -3px -3px 8px rgba(255, 255, 255, 0.9);
+}
+[data-theme='neu'] .nav-item.active,
+[data-theme='neu'] .update-badge {
+  box-shadow: inset 2px 2px 6px rgba(163, 177, 198, 0.6), inset -2px -2px 6px rgba(255, 255, 255, 0.9);
+}
+[data-theme='neu'] .titlebar { border-bottom: none; }
+
+/* ============================================================
+   六、主题 5/6 · 玻璃拟态 glass
+   设计语言：彩色渐变背景上的毛玻璃。半透明面板 + 背景模糊 +
+   1px 高光描边 + 柔和外发光，层次靠透明度而不是阴影。
+   ============================================================ */
+[data-theme='glass'] {
+  --body-bg: linear-gradient(135deg, #5a4bff 0%, #a34bff 34%, #ff5ea8 64%, #ffb35e 100%);
+  --bg: rgba(255, 255, 255, 0.07);
+  --surface: rgba(255, 255, 255, 0.15);
+  --surface-2: rgba(255, 255, 255, 0.22);
+  --surface-3: rgba(255, 255, 255, 0.32);
+  --ink: #ffffff;
+  --ink-soft: rgba(255, 255, 255, 0.84);
+  --ink-faint: rgba(255, 255, 255, 0.6);
+  --line: rgba(255, 255, 255, 0.3);
+  --line-strong: rgba(255, 255, 255, 0.55);
+  --accent: #ffffff;
+  --accent-2: rgba(255, 255, 255, 0.85);
+  --accent-3: rgba(255, 255, 255, 0.45);
+  --accent-soft: rgba(255, 255, 255, 0.18);
+  --on-accent: #4a2b7a;
+  --sidebar-bg: rgba(255, 255, 255, 0.1);
+  --shadow-sm: 0 2px 12px rgba(24, 10, 60, 0.16);
+  --shadow-md: 0 10px 30px rgba(24, 10, 60, 0.22);
+  --shadow-lg: 0 22px 60px rgba(24, 10, 60, 0.3);
+  --radius-xs: 12px;
+  --radius-sm: 14px;
+  --radius-md: 16px;
+  --radius: 18px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+  --label-transform: none;
+  --label-tracking: 0;
+  --panel-blur: blur(20px) saturate(165%);
+}
+
+/* 毛玻璃：给主要面板加背景模糊 + 高光描边 */
+[data-theme='glass'] .titlebar,
+[data-theme='glass'] .sidebar,
+[data-theme='glass'] .content,
+[data-theme='glass'] .modal-card,
+[data-theme='glass'] .pop,
+[data-theme='glass'] .composer,
+[data-theme='glass'] .chat-sessions,
+[data-theme='glass'] .chat-input-wrap,
+[data-theme='glass'] .ws-add-menu,
+[data-theme='glass'] .update-badge {
+  -webkit-backdrop-filter: var(--panel-blur);
+  backdrop-filter: var(--panel-blur);
+}
+[data-theme='glass'] .modal-card,
+[data-theme='glass'] .pop,
+[data-theme='glass'] .composer,
+[data-theme='glass'] .update-badge {
+  border: 1px solid var(--line);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), var(--shadow-lg);
+}
+[data-theme='glass'] .primary-btn {
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--on-accent);
+}
+[data-theme='glass'] .ghost-btn {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--ink);
+}
+[data-theme='glass'] .titlebar { border-bottom: 1px solid var(--line); }
+[data-theme='glass'] .brand-mark { background: rgba(255, 255, 255, 0.2); border: 1px solid var(--line); }
+[data-theme='glass'] select.text-input option { background: #2c1e52; color: #fff; }
+
+/* ============================================================
+   七、主题 6/6 · 粗野主义 brutal
+   设计语言：新粗野主义。高对比、3px 粗黑描边、零模糊的硬投影、
+   高饱和撞色（黄/蓝）、零圆角、超粗字重，把「结构」直接暴露出来。
+   ============================================================ */
+[data-theme='brutal'] {
+  --body-bg: #fff8e1;
+  --bg: #fffdf5;
+  --surface: #ffffff;
+  --surface-2: #ffe873;
+  --surface-3: #ffd400;
+  --ink: #000000;
+  --ink-soft: #141414;
+  --ink-faint: #3d3d3d;
+  --line: #000000;
+  --line-strong: #000000;
+  --accent: #2b5dff;
+  --accent-2: #000000;
+  --accent-3: #ffd400;
+  --accent-soft: rgba(43, 93, 255, 0.16);
+  --on-accent: #ffffff;
+  --sidebar-bg: #ffd400;
+  --shadow-sm: 2px 2px 0 #000;
+  --shadow-md: 4px 4px 0 #000;
+  --shadow-lg: 7px 7px 0 #000;
+  --radius-xs: 0;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-pill: 0;
+  --font-display: 'Inter', 'Segoe UI', system-ui, 'Microsoft YaHei', sans-serif;
+  --font-body: var(--font-display);
+  --label-transform: uppercase;
+  --label-tracking: 0.04em;
+  --panel-blur: none;
+  --duration: 0.06s;
+}
+
+[data-theme='brutal'] .primary-btn {
+  border: 2px solid #000;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 800;
+  box-shadow: 3px 3px 0 #000;
+}
+[data-theme='brutal'] .primary-btn:hover { opacity: 1; transform: translate(-1px, -1px); box-shadow: 4px 4px 0 #000; }
+[data-theme='brutal'] .primary-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #000; }
+[data-theme='brutal'] .ghost-btn {
+  border: 2px solid #000;
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 700;
+}
+[data-theme='brutal'] .modal-card,
+[data-theme='brutal'] .pop,
+[data-theme='brutal'] .composer,
+[data-theme='brutal'] .update-badge,
+[data-theme='brutal'] .text-input,
+[data-theme='brutal'] .code-input,
+[data-theme='brutal'] .tool-pill,
+[data-theme='brutal'] .toast,
+[data-theme='brutal'] .progress-card,
+[data-theme='brutal'] .img-card {
+  border: 2px solid #000;
+}
+[data-theme='brutal'] .modal-card,
+[data-theme='brutal'] .composer,
+[data-theme='brutal'] .progress-card { box-shadow: 6px 6px 0 #000; }
+[data-theme='brutal'] .update-badge { box-shadow: 2px 2px 0 #000; background: var(--surface); }
+[data-theme='brutal'] .titlebar { border-bottom: 3px solid #000; }
+[data-theme='brutal'] .nav-item.active {
+  background: var(--surface-3);
+  border: 2px solid #000;
+  font-weight: 800;
+}
+[data-theme='brutal'] .brand-mark { background: #000; color: #ffd400; }
+[data-theme='brutal'] .toast { background: #000; color: #ffd400; }
+[data-theme='brutal'] .hero-title,
+[data-theme='brutal'] .display-title { font-weight: 900; letter-spacing: -0.6px; }
+[data-theme='brutal'] select.text-input option { color: #000; background: #fff; }
+
+/* ============================================================
+   八、界面密度
+   --space-scale 由 <html data-density="..."> 决定，
+   只缩放「主要留白」，不改变字号与控件高度，避免破坏布局。
+   ============================================================ */
+[data-density='compact'] { --space-scale: 0.84; }
+[data-density='cozy'] { --space-scale: 1; }
+[data-density='roomy'] { --space-scale: 1.18; }
+
+.view { padding: calc(28px * var(--space-scale)) calc(34px * var(--space-scale)); }
+.sidebar { padding: calc(10px * var(--space-scale)); }
+.modal-body { padding: calc(6px * var(--space-scale)) calc(22px * var(--space-scale)) calc(22px * var(--space-scale)); }
+.gallery-grid { gap: calc(14px * var(--space-scale)); }
+
+/* ============================================================
+   九、实心控件对比度修正
+   下面这些控件原本假设「--ink 是深色、配白字」（如 .send-btn / .feature-pill.accent）。
+   终端与玻璃两套主题把 --ink 换成了浅色，若不做修正就会出现浅底浅字。
+   这里统一改用「强调色 + on-accent」组合，保证任何主题下都清晰可读。
+   ============================================================ */
+[data-theme='terminal'] :is(.empty-mark, .global-tip, .chat-empty-icon, .chat-attach-del,
+    .dt-btn.primary, .dt-mark-tip, .dt-toast, .send-btn, .feature-pill.accent,
+    .desk-button.primary, .novel-empty-manuscript, .novel-gen-submit),
+[data-theme='glass'] :is(.empty-mark, .global-tip, .chat-empty-icon, .chat-attach-del,
+    .dt-btn.primary, .dt-mark-tip, .dt-toast, .send-btn, .feature-pill.accent,
+    .desk-button.primary, .novel-empty-manuscript, .novel-gen-submit) {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+[data-theme='terminal'] .toast:not(.error):not(.success):not(.warn),
+[data-theme='glass'] .toast:not(.error):not(.success):not(.warn) {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* 原生下拉选项背景是写死的 #fff，浅色 ink 主题需要显式覆盖 */
+[data-theme='terminal'] select.text-input option { color: #03130b; background: #d9ffe9; }
+[data-theme='neu'] select.text-input option { color: #44506b; background: #eef2f8; }

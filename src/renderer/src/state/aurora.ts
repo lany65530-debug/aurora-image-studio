@@ -33,6 +33,9 @@ export const win = raw.window
 /* ===== 自动更新（GitHub Releases） ===== */
 export const updater = raw.updater
 
+/* ===== 界面设置（主题 / 字号 / 密度 / 动效） ===== */
+export const ui = raw.ui
+
 /* ===== 全局设置 ===== */
 export const settings = raw.settings
 

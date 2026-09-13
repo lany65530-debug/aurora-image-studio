@@ -17,7 +17,9 @@ import { initGallery } from './gallery'
 import { initOverlayGlobals } from './modals/overlay'
 import { initWsSettings, openWsModal } from './modals/wsSettings'
 import { initNewWorkspace } from './modals/newWorkspace'
+import { initAppSettings } from './modals/appSettings'
 import { initUpdateBadge } from './components/updateBadge'
+import { applyCachedUi, initUiSettings } from './state/ui'
 import { setOpenWsSettings as setImageOpenWsSettings } from './workspaces/image'
 import { setOpenWsSettings as setChatOpenWsSettings } from './workspaces/chat'
 
@@ -110,6 +112,7 @@ async function bootstrap(): Promise<void> {
 
   // 装配各层
   initWindowControls()
+  initAppSettings()
   initUpdateBadge()
   initOverlayGlobals()
   initNav()
@@ -117,7 +120,13 @@ async function bootstrap(): Promise<void> {
   initWsSettings()
   initNewWorkspace()
 
+  // 界面设置（主题/字号/密度/动效）：从主进程取权威值，覆盖首帧的缓存值
+  await initUiSettings()
+
   await initWorkspaces()
 }
+
+// 首帧：先用 localStorage 缓存把主题贴上，避免启动先闪一下默认样式
+applyCachedUi()
 
 void bootstrap()

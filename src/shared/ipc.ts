@@ -93,6 +93,13 @@ export const IPC = {
   Shell: {
     openPath: 'shell:openPath'
   },
+  /** 界面设置（主题 / 字号 / 密度 / 动效）。 */
+  Ui: {
+    /** 读取界面设置。 */
+    get: 'ui:get',
+    /** 保存界面设置（增量合并）。 */
+    save: 'ui:save'
+  },
   /** 自动更新（GitHub Releases）。 */
   Updater: {
     /** 查询当前更新状态快照。 */

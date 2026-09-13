@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import { autoUpdater, type ProgressInfo, type UpdateInfo } from 'electron-updater'
 import { IPC } from '../../shared/ipc'
 import type { UpdaterState, UpdaterStatus } from '../../shared/types'
+import { loadUiSettings } from './uiSettings'
 
 /**
  * 自动更新服务（electron-updater + GitHub Releases）。
@@ -143,15 +144,21 @@ function bindEvents(): void {
   })
 }
 
-/** 初始化更新服务：注册事件 + 安排自动检查。 */
-export function initUpdater(): void {
-  if (started) return
-  started = true
+/** 清掉自动检查的定时器。 */
+function clearTimers(): void {
+  if (delayedTimer) clearTimeout(delayedTimer)
+  if (intervalTimer) clearInterval(intervalTimer)
+  delayedTimer = null
+  intervalTimer = null
+}
 
-  status.currentVersion = app.getVersion()
-  bindEvents()
-
-  if (!isEnabled()) return
+/**
+ * 按设置开关启停「自动检查更新」。
+ * 关闭时只停定时器，用户仍可在界面上手动点「检查更新」。
+ */
+export function applyAutoCheckSetting(enabled: boolean): void {
+  clearTimers()
+  if (!started || !enabled || !isEnabled()) return
 
   delayedTimer = setTimeout(() => {
     void checkForUpdates(false)
@@ -164,12 +171,20 @@ export function initUpdater(): void {
   intervalTimer.unref?.()
 }
 
+/** 初始化更新服务：注册事件 + 按界面设置安排自动检查。 */
+export function initUpdater(): void {
+  if (started) return
+  started = true
+
+  status.currentVersion = app.getVersion()
+  bindEvents()
+
+  applyAutoCheckSetting(loadUiSettings().autoCheckUpdate)
+}
+
 /** 停止定时器（退出前调用，非必须）。 */
 export function disposeUpdater(): void {
-  if (delayedTimer) clearTimeout(delayedTimer)
-  if (intervalTimer) clearInterval(intervalTimer)
-  delayedTimer = null
-  intervalTimer = null
+  clearTimers()
 }
 
 /** 读取当前更新状态。 */

@@ -10,6 +10,7 @@ import { registerNovelIpc } from './controllers/novel'
 import { registerDetectorIpc } from './controllers/detector'
 import { registerEditorIpc } from './controllers/editor'
 import { registerUpdaterIpc } from './controllers/updater'
+import { registerUiSettingsIpc } from './controllers/uiSettings'
 import { initUpdater } from './services/updater'
 import { setupGpuAcceleration } from './config/gpu'
 
@@ -39,6 +40,7 @@ app.whenReady().then(() => {
   registerDetectorIpc()
   registerEditorIpc()
   registerUpdaterIpc()
+  registerUiSettingsIpc()
 
   createWindow()
 

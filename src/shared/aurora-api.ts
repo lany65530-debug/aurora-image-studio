@@ -23,7 +23,8 @@ import type {
   ModelItem,
   ChooseDirResult,
   ProviderTestParams,
-  UpdaterStatus
+  UpdaterStatus,
+  UiSettings
 } from './types'
 import type {
   NovelDeleteResult,
@@ -77,6 +78,11 @@ export interface AuroraApi {
   app: {
     getInfo: () => Promise<AppInfo>
     gpuStatus: () => Promise<GpuStatus>
+  }
+  /** 界面设置：主题 / 字号 / 密度 / 动效。 */
+  ui: {
+    get: () => Promise<UiSettings>
+    save: (patch: Partial<UiSettings>) => Promise<{ ok: boolean }>
   }
   /** 自动更新：检查 / 下载 / 安装（GitHub Releases）。 */
   updater: {

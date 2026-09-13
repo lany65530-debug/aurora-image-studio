@@ -56,6 +56,136 @@ export interface UpdaterStatus {
   manual?: boolean
 }
 
+/* ===== 界面设置（主题 / 字号 / 密度 / 动效） ===== */
+
+/**
+ * 六套主题，每套是一套独立的视觉语言（不是换色）：
+ *  - aurora   极简光感：白底、中性灰阶、柔和投影、圆润系统字
+ *  - terminal 终端磷光：近黑底 + 荧光绿、等宽字、直角、扫描线、发光描边
+ *  - paper    纸上书卷：米黄纸感、衬线字、发丝线分隔、零投影、编辑排版
+ *  - neu      柔和浮雕：与底色同色的双向柔影、大圆角、无描边、低对比
+ *  - glass    玻璃拟态：彩色渐变底 + 毛玻璃、半透明描边、光晕
+ *  - brutal   粗野主义：高对比、粗黑描边、硬阴影（零模糊）、高饱和撞色
+ */
+export const UI_THEMES = ['aurora', 'terminal', 'paper', 'neu', 'glass', 'brutal'] as const
+export type UiTheme = (typeof UI_THEMES)[number]
+
+/** 主题的展示元信息（设置界面用）。 */
+export interface ThemeMeta {
+  id: UiTheme
+  /** 主题名（中文） */
+  name: string
+  /** 设计语言一句话说明 */
+  desc: string
+  /** 预览用的代表色，依次为：底色 / 表面 / 主色 / 强调色 */
+  swatch: [string, string, string, string]
+}
+
+/** 界面字号档位。 */
+export const UI_FONT_SCALES = ['sm', 'md', 'lg', 'xl'] as const
+export type UiFontScale = (typeof UI_FONT_SCALES)[number]
+
+/** 界面密度。 */
+export const UI_DENSITIES = ['compact', 'cozy', 'roomy'] as const
+export type UiDensity = (typeof UI_DENSITIES)[number]
+
+/** 用户可调的界面设置。 */
+export interface UiSettings {
+  theme: UiTheme
+  fontScale: UiFontScale
+  density: UiDensity
+  /** 关闭后停用大部分过渡/动画（对低性能机器或无动画偏好者友好） */
+  reduceMotion: boolean
+  /** 启动后是否自动检查更新 */
+  autoCheckUpdate: boolean
+}
+
+/** 主题元信息表（设置界面渲染 / 排序依据）。 */
+export const THEME_META: ThemeMeta[] = [
+  {
+    id: 'aurora',
+    name: '极简光感',
+    desc: '白底留白 · 柔和投影 · 中性无衬线，最耐看的一版',
+    swatch: ['#ffffff', '#f4f4f4', '#0d0d0d', '#0a7d43']
+  },
+  {
+    id: 'terminal',
+    name: '终端磷光',
+    desc: '近黑底 + 荧光绿 · 全等宽字 · 直角发光描边 · 扫描线',
+    swatch: ['#05080a', '#0a1210', '#00ff88', '#b8ffd0']
+  },
+  {
+    id: 'paper',
+    name: '纸上书卷',
+    desc: '米黄纸感 · 衬线正文 · 发丝线分隔 · 零投影的排版语言',
+    swatch: ['#f6f1e7', '#fbf8f1', '#9c3d2e', '#2b2620']
+  },
+  {
+    id: 'neu',
+    name: '柔和浮雕',
+    desc: '同色双向柔影 · 大圆角 · 无描边 · 低对比的触摸感',
+    swatch: ['#e8ecf2', '#e8ecf2', '#5b7cfa', '#4a5568']
+  },
+  {
+    id: 'glass',
+    name: '玻璃拟态',
+    desc: '彩色渐变底 · 毛玻璃模糊面板 · 半透明描边与光晕',
+    swatch: ['#6a5cff', '#ff5ea8', '#ffffff', '#35d0ba']
+  },
+  {
+    id: 'brutal',
+    name: '粗野主义',
+    desc: '粗黑描边 · 硬阴影零模糊 · 高饱和撞色 · 无圆角',
+    swatch: ['#fffdf5', '#ffffff', '#ffd400', '#2b5dff']
+  }
+]
+
+/** 界面设置默认值。 */
+export function defaultUiSettings(): UiSettings {
+  return {
+    theme: 'aurora',
+    fontScale: 'md',
+    density: 'cozy',
+    reduceMotion: false,
+    autoCheckUpdate: true
+  }
+}
+
+/**
+ * 把任意输入归一成合法 UiSettings（主进程落盘与渲染层读缓存共用同一份规则，
+ * 保证「手改配置文件 / 旧版本数据 / 脏缓存」都不会把界面搞坏）。
+ */
+export function normalizeUiSettings(raw: unknown): UiSettings {
+  const d = defaultUiSettings()
+  if (!raw || typeof raw !== 'object') return d
+  const s = raw as Partial<UiSettings>
+  const pick = <T extends string>(v: unknown, allowed: readonly T[], fb: T): T =>
+    typeof v === 'string' && (allowed as readonly string[]).includes(v) ? (v as T) : fb
+  const bool = (v: unknown, fb: boolean): boolean => (typeof v === 'boolean' ? v : fb)
+  return {
+    theme: pick<UiTheme>(s.theme, UI_THEMES, d.theme),
+    fontScale: pick<UiFontScale>(s.fontScale, UI_FONT_SCALES, d.fontScale),
+    density: pick<UiDensity>(s.density, UI_DENSITIES, d.density),
+    reduceMotion: bool(s.reduceMotion, d.reduceMotion),
+    autoCheckUpdate: bool(s.autoCheckUpdate, d.autoCheckUpdate)
+  }
+}
+
+/** 字号档位 → 根字号（px）。 */
+export const FONT_SCALE_PX: Record<UiFontScale, string> = {
+  sm: '13.5px',
+  md: '14.5px',
+  lg: '15.5px',
+  xl: '17px'
+}
+
+/** 密度档位 → 间距缩放系数。 */
+export const DENSITY_SCALE: Record<UiDensity, string> = {
+  compact: '0.86',
+  cozy: '1',
+  roomy: '1.14'
+}
+
 /** 图片保存/编辑相关的组合尺寸比例。 */
 export const IMAGE_RATIOS = ['1:1', '3:2', '2:3', '4:3', '3:4', '5:4', '4:5', '16:9', '9:16', '2:1', '1:2', '21:9', '9:21'] as const
 export type ImageRatio = (typeof IMAGE_RATIOS)[number]

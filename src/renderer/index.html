@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="aurora" data-density="cozy" data-motion="on">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -21,7 +21,10 @@
     <link rel="stylesheet" href="./src/styles/workspace/chat.css" />
     <link rel="stylesheet" href="./src/styles/component/sidebar.css" />
     <link rel="stylesheet" href="./src/styles/component/dialog.css" />
+    <link rel="stylesheet" href="./src/styles/component/appSettings.css" />
     <link rel="stylesheet" href="./src/styles/workspace/novel.css" />
+    <!-- 主题必须最后加载：靠后才能在同等特异性下覆盖组件样式 -->
+    <link rel="stylesheet" href="./src/styles/base/themes.css" />
   </head>
   <body>
     <!-- Custom title bar -->
@@ -36,6 +39,11 @@
           <span class="brand-name">Aurora<span class="brand-thin">Studio</span></span>
         </div>
       </div>
+      <!-- 应用设置入口（主题 / 界面 / 更新） -->
+      <button class="settings-entry-btn" id="settingsEntryBtn" type="button" title="应用设置">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19.14 12.94a7.07 7.07 0 0 0 .06-.94 7.07 7.07 0 0 0-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.1 7.1 0 0 0-1.62-.94l-.36-2.54A.5.5 0 0 0 13.9 2h-3.8a.5.5 0 0 0-.47.4l-.36 2.54a7.07 7.07 0 0 0-1.62.94L5.24 4.92a.5.5 0 0 0-.6.22l-1.92 3.32a.5.5 0 0 0 .12.64l2.03 1.58a7.07 7.07 0 0 0-.06.94c0 .32.02.64.06.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.13.22.4.3.6.22l2.39-.96c.5.38 1.04.7 1.62.94l.36 2.54c.04.24.25.4.47.4h3.8a.5.5 0 0 0 .47-.4l.36-2.54c.58-.24 1.12-.56 1.62-.94l2.39.96c.2.08.47 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64Zm-7.14 2.56A3.5 3.5 0 1 1 15.5 12a3.5 3.5 0 0 1-3.5 3.5Z"/></svg>
+        <span>设置</span>
+      </button>
       <!-- 自动更新入口：常态「检查更新」，发现新版本 / 下载中 / 待重启时自动切换文案 -->
       <button class="update-badge" id="updateBadge" type="button" data-state="idle" title="检查更新">
         <span class="update-badge-dot"></span>
@@ -646,6 +654,20 @@
             <button class="primary-btn danger-btn" id="confirmOkBtn" type="button">删除</button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- 应用设置弹窗（主题 / 界面 / 更新）：全应用级，内容由 modals/appSettings.ts 渲染 -->
+    <div class="modal-overlay" id="appSettingsModal" role="dialog" aria-modal="true" aria-labelledby="appSettingsTitle" tabindex="-1">
+      <div class="modal-card app-settings-card">
+        <div class="modal-head">
+          <div class="modal-title">
+            <svg class="modal-gear" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M19.14 12.94a7.07 7.07 0 0 0 .06-.94 7.07 7.07 0 0 0-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.1 7.1 0 0 0-1.62-.94l-.36-2.54A.5.5 0 0 0 13.9 2h-3.8a.5.5 0 0 0-.47.4l-.36 2.54a7.07 7.07 0 0 0-1.62.94L5.24 4.92a.5.5 0 0 0-.6.22l-1.92 3.32a.5.5 0 0 0 .12.64l2.03 1.58a7.07 7.07 0 0 0-.06.94c0 .32.02.64.06.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.13.22.4.3.6.22l2.39-.96c.5.38 1.04.7 1.62.94l.36 2.54c.04.24.25.4.47.4h3.8a.5.5 0 0 0 .47-.4l.36-2.54c.58-.24 1.12-.56 1.62-.94l2.39.96c.2.08.47 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64Zm-7.14 2.56A3.5 3.5 0 1 1 15.5 12a3.5 3.5 0 0 1-3.5 3.5Z"/></svg>
+            <h3 id="appSettingsTitle">应用设置</h3>
+          </div>
+          <button class="modal-close" id="appSettingsClose" title="关闭">✕</button>
+        </div>
+        <div class="modal-body app-settings-body" id="appSettingsBody"></div>
       </div>
     </div>
 

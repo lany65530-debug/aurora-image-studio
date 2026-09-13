@@ -29,6 +29,10 @@ export const api: AuroraApi = {
     getInfo: () => ipcRenderer.invoke(IPC.App.info),
     gpuStatus: () => ipcRenderer.invoke(IPC.App.gpuStatus)
   },
+  ui: {
+    get: () => ipcRenderer.invoke(IPC.Ui.get),
+    save: (patch) => ipcRenderer.invoke(IPC.Ui.save, patch)
+  },
   updater: {
     getStatus: () => ipcRenderer.invoke(IPC.Updater.status),
     check: () => ipcRenderer.invoke(IPC.Updater.check),

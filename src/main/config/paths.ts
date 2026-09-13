@@ -9,6 +9,9 @@ export const userDataPath = (): string => app.getPath('userData')
 /** 全局设置文件。 */
 export const settingsFile = (): string => join(userDataPath(), 'settings.json')
 
+/** 界面设置文件（主题 / 字号 / 密度 / 动效），与接口配置分开存放。 */
+export const uiSettingsFile = (): string => join(userDataPath(), 'ui-settings.json')
+
 /** 图片库条目文件。 */
 export const libraryFile = (): string => join(userDataPath(), 'library.json')
 
