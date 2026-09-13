@@ -35,6 +35,7 @@ export function initUpdateBadge(): void {
 
   let current: UpdaterStatus = { state: 'idle', currentVersion: '' }
   let notifiedVersion = ''
+  let notifiedLatest = false
   let busy = false
 
   const render = (s: UpdaterStatus): void => {
@@ -86,6 +87,12 @@ export function initUpdateBadge(): void {
     if (state === 'available' && s.version && s.version !== notifiedVersion) {
       notifiedVersion = s.version
       toast(`发现新版本 v${s.version}，点击右上角「发现 v${s.version}」即可更新`, 'info', 6000)
+    }
+    // 用户手动检查、但已经是最新版：必须给个反馈，否则像没反应
+    if (state === 'checking') notifiedLatest = false
+    if (state === 'not-available' && s.manual && !notifiedLatest) {
+      notifiedLatest = true
+      toast(`已经是最新版本 v${s.currentVersion}`, 'success')
     }
     // 开发模式下手动点击：给出明确解释
     if (dev && s.manual) {

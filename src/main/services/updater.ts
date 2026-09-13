@@ -1,4 +1,6 @@
 import { app, BrowserWindow } from 'electron'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { autoUpdater, type ProgressInfo, type UpdateInfo } from 'electron-updater'
 import { IPC } from '../../shared/ipc'
 import type { UpdaterState, UpdaterStatus } from '../../shared/types'
@@ -32,11 +34,24 @@ function isEnabled(): boolean {
   return app.isPackaged
 }
 
+/** 读取打包时写入的更新源（app-update.yml），把错误提示说得更具体。 */
+function describeUpdateSource(): string {
+  try {
+    const text = readFileSync(join(process.resourcesPath, 'app-update.yml'), 'utf8')
+    const owner = /^owner:\s*(.+)$/m.exec(text)?.[1]?.trim()
+    const repo = /^repo:\s*(.+)$/m.exec(text)?.[1]?.trim()
+    if (owner && repo) return `（当前更新仓库：${owner}/${repo}）`
+  } catch {
+    /* 读不到就忽略 */
+  }
+  return ''
+}
+
 /** 把 electron-updater 抛出的英文错误转成用户能看懂的中文提示。 */
 function friendlyError(err: unknown): string {
   const raw = err instanceof Error ? err.message : String(err)
   if (/404|not found|cannot find|ENOENT/i.test(raw)) {
-    return '未找到发布信息：请确认仓库已发布 Release，且 tag 形如 v1.0.0。'
+    return `未找到发布信息：请确认该仓库已发布 Release（tag 需形如 v1.0.0）${describeUpdateSource()}`
   }
   if (/ENOTFOUND|EAI_AGAIN|ETIMEDOUT|ECONNRESET|ECONNREFUSED|getaddrinfo|network|socket hang up/i.test(raw)) {
     return '网络连接失败：请检查网络（含代理/VPN）后重试。'
