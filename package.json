@@ -1,6 +1,6 @@
 {
   "name": "aurora-image-studio-v2",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "极光工作室 - 基于 gpt-image-2 的桌面端 AI 图片生成软件（v2 模块化重构）",
   "main": "./out/main/index.js",
   "author": "Aurora Studio",
