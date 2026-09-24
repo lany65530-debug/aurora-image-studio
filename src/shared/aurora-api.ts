@@ -138,6 +138,7 @@ export interface AuroraApi {
     delete: (args: DeleteLibraryArgs) => Promise<{ ok: boolean }>
     clear: () => Promise<{ ok: boolean }>
     thumb: (args: LibraryThumbArgs) => Promise<LibraryThumbResult>
+    fileInfo: (id: string) => Promise<{ ok: boolean; bytes?: number }>
   }
   novel: {
     list: () => Promise<NovelSummary[]>

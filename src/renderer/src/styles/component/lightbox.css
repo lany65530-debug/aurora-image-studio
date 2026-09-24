@@ -1,16 +1,127 @@
-/* ---------- Lightbox ---------- */
 .lightbox {
-  position: fixed; inset: 0; z-index: 100;
-  display: none; align-items: center; justify-content: center;
-  background: rgba(0, 0, 0, 0.85);
-  padding: 60px;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  color: #393d40;
+  font-family: var(--font-body);
+  background: transparent;
 }
-.lightbox.open { display: flex; animation: fadeIn 0.2s; }
-.lightbox img { max-width: 100%; max-height: 100%; border-radius: 8px; }
+.lightbox.open { display: block; animation: fadeIn var(--duration) var(--ease); }
+.lightbox-panel { position: relative; width: 100%; height: 100%; overflow: hidden; }
+.lightbox-toolbar {
+  position: absolute;
+  z-index: 1;
+  top: 24px;
+  left: 32px;
+  right: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  pointer-events: none;
+}
+.lightbox-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  background: rgba(55, 59, 62, 0.72);
+  color: #fff;
+  pointer-events: auto;
+}
+.lightbox-controls button {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background var(--duration);
+}
+.lightbox-controls button:hover:not(:disabled) { background: rgba(255, 255, 255, 0.2); }
+.lightbox-controls button:disabled { opacity: 0.45; cursor: default; }
+.lightbox-toolbar button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; box-shadow: 0 0 0 4px #393d40; }
+#lightboxZoomValue { min-width: 48px; text-align: center; font-variant-numeric: tabular-nums; font-size: 12px; }
 .lightbox-close {
-  position: absolute; top: 26px; right: 30px;
-  width: 40px; height: 40px; border-radius: 50%;
-  border: none; background: rgba(255,255,255,0.1); color: #fff;
-  font-size: 18px; cursor: pointer; transition: background 0.15s;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(55, 59, 62, 0.72);
+  color: #fff;
+  font: inherit;
+  font-size: 18px;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background var(--duration);
 }
-.lightbox-close:hover { background: rgba(255,255,255,0.22); }
+.lightbox-close:hover { background: #393d40; }
+.lightbox-stage {
+  position: absolute;
+  inset: 76px 32px 112px;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+}
+.lightbox-stage.can-pan { cursor: grab; }
+.lightbox-stage.panning { cursor: grabbing; }
+.lightbox-stage img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  max-width: min(100%, 1400px);
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--radius-xs);
+  pointer-events: none;
+  transform-origin: center;
+  will-change: transform;
+}
+.lightbox-footer {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  justify-content: center;
+  max-height: 84px;
+}
+.lightbox-details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 18px;
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: min(100%, 1100px);
+  padding: 10px 18px;
+  overflow-y: auto;
+  border-radius: var(--radius-lg);
+  background: rgba(55, 59, 62, 0.72);
+  color: #fff;
+}
+.lightbox-detail { display: inline-flex; align-items: baseline; gap: 5px; min-width: 0; font-size: 12px; }
+.lightbox-detail-label, .lightbox-detail-value { color: #fff; }
+.lightbox-detail-value { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.lightbox-prompt { max-width: min(320px, 30vw); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+@media (max-width: 700px) {
+  .lightbox-toolbar { top: 12px; left: 12px; right: 12px; }
+  .lightbox-stage { inset: 64px 12px 128px; }
+  .lightbox-footer { bottom: 12px; left: 12px; right: 12px; max-height: 108px; }
+  .lightbox-details { gap: 5px 12px; }
+  .lightbox-prompt { max-width: 190px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lightbox.open { animation: none; }
+}

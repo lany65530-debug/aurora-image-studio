@@ -11,6 +11,17 @@ import { getMainWindow } from '../window-store'
 /** 图片库 IPC：library:get / library:delete / library:clear，及目录选择打开、图片另存、shell 打开。 */
 export function registerLibraryIpc(): void {
   ipcMain.handle(IPC.Library.get, () => loadLibrary())
+  ipcMain.handle(IPC.Library.fileInfo, (_e, id: string) => {
+    if (typeof id !== 'string' || !id) return { ok: false }
+    const entry = loadLibrary().find((item) => item.id === id)
+    if (typeof entry?.filePath !== 'string' || !entry.filePath) return { ok: false }
+    try {
+      const stat = fs.statSync(entry.filePath)
+      return stat.isFile() ? { ok: true, bytes: stat.size } : { ok: false }
+    } catch {
+      return { ok: false }
+    }
+  })
   ipcMain.handle(IPC.Library.delete, async (_e, args: { id?: string; deleteFile?: boolean }) => {
     let targetPath = ''
     await enqueueLibrary((lib) => {

@@ -958,7 +958,7 @@ function buildChatMsgEl(m: any): HTMLElement {
     imEl.src = m.imageGen.fileUrl
     imEl.alt = m.imageGen.prompt || ''
     imEl.loading = 'lazy'
-    imEl.addEventListener('click', () => openLightbox(m.imageGen.fileUrl))
+    imEl.addEventListener('click', () => openLightbox(m.imageGen.fileUrl, m.imageGen.transparentBackground === true, m.imageGen))
     wrap.appendChild(imEl)
     const cap = document.createElement('div')
     cap.className = 'chat-gen-cap'
@@ -1610,7 +1610,7 @@ async function executeChatDraw(args: any, _tc: any, ws: ChatWorkspace): Promise<
       return { summary: `绘图失败：${res.error || '未返回图片'}` }
     }
     const im = res.images[0]
-    const imageGen = { fileUrl: im.fileUrl || im.remoteUrl, prompt, size }
+    const imageGen = { fileUrl: im.fileUrl || im.remoteUrl, prompt, size, id: im.id, model: im.model, ts: im.ts, transparentBackground: im.transparentBackground }
     $('#chatMessages').appendChild(buildChatMsgEl({ role: 'assistant', imageGen }))
     scrollChatBottom(false)
     return { summary: `图片已生成并展示给用户（比例 ${size}，提示词：${prompt}）。`, imageGen }

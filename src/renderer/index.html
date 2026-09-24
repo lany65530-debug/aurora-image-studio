@@ -201,6 +201,11 @@
                     </div>
                   </div>
 
+                  <button type="button" class="tool-pill" id="transparentPill" aria-pressed="false" title="尝试请求透明 PNG；接口不支持时会显示返回的错误">
+                    <span class="transparency-icon" aria-hidden="true"></span>
+                    <span>透明背景</span>
+                  </button>
+
                   <!-- resolution -->
                   <div class="tool-pill has-pop" data-pop="resolution">
                     <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3v2M12 19v2M3 12h2M19 12h2M6 6l1.4 1.4M16.6 16.6L18 18M18 6l-1.4 1.4M7.4 16.6L6 18" stroke-linecap="round"/><circle cx="12" cy="12" r="3.2"/></svg>
@@ -479,7 +484,6 @@
           <label class="field">
             <span class="field-label">接口地址</span>
             <input id="wsBaseUrl" type="text" class="text-input" placeholder="https://your-relay.com" autocomplete="off" />
-            <span class="field-hint">软件会根据地址自动适配接口格式（DragonAPI / OpenAI / 灵悟 / Stability 均兼容），无需手动选择类型。</span>
           </label>
 
           <label class="field">
@@ -672,9 +676,22 @@
     </div>
 
     <!-- Lightbox -->
-    <div class="lightbox" id="lightbox">
-      <button class="lightbox-close" id="lightboxClose">✕</button>
-      <img id="lightboxImg" alt="预览" />
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="图片查看器" tabindex="-1">
+      <div class="lightbox-panel">
+        <div class="lightbox-toolbar">
+          <div class="lightbox-controls">
+            <button type="button" id="lightboxZoomOut" aria-label="缩小图片" title="缩小">−</button>
+            <span id="lightboxZoomValue" aria-live="polite">100%</span>
+            <button type="button" id="lightboxZoomIn" aria-label="放大图片" title="放大">＋</button>
+            <button type="button" id="lightboxReset" title="重置视图">适应</button>
+          </div>
+          <button type="button" class="lightbox-close" id="lightboxClose" aria-label="关闭图片查看器" title="关闭">✕</button>
+        </div>
+        <div class="lightbox-stage" id="lightboxStage"><img id="lightboxImg" alt="预览" draggable="false" /></div>
+        <div class="lightbox-footer">
+          <div class="lightbox-details" id="lightboxDetails"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Toast -->

@@ -207,10 +207,22 @@ $$('#resolutionPop .pop-opt').forEach((opt) => {
   })
 })
 
+const transparentPill = $('#transparentPill')
+transparentPill.addEventListener('click', () => {
+  const ws = activeImageWs()
+  if (!ws) return
+  ws.transparentBackground = !ws.transparentBackground
+  transparentPill.classList.toggle('active', ws.transparentBackground)
+  transparentPill.setAttribute('aria-pressed', String(ws.transparentBackground))
+  persistWorkspaces()
+})
+
 /* ===== 创作视图重绑定 ===== */
 const generateBtn = $('#generateBtn')
 
 export function bindCreateWorkspace(ws: ImageWorkspace): void {
+  transparentPill.classList.toggle('active', ws.transparentBackground === true)
+  transparentPill.setAttribute('aria-pressed', String(ws.transparentBackground === true))
   updateModelPill(ws)
   renderModelPop(ws)
   updateSendMode(ws)
@@ -466,6 +478,7 @@ async function doGenerate(retry?: { ws: ImageWorkspace; prompt: string; refs: Re
       size,
       n: count,
       resolution: ws.resolution || '2k',
+      transparentBackground: ws.transparentBackground === true,
       provider: await wsProvider(ws),
       baseUrl: (ws.baseUrl || '').trim(),
       apiKey: (ws.apiKey || '').trim(),

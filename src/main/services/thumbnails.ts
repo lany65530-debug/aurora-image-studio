@@ -1,5 +1,6 @@
 import { nativeImage, type NativeImage } from 'electron'
 import fs from 'fs'
+import path from 'path'
 
 /**
  * 主进程 · 图片缩略图服务
@@ -60,9 +61,17 @@ function fileStamp(filePath: string): string {
 function toDataUrl(img: NativeImage): string | null {
   try {
     if (img.isEmpty()) return null
-    const buf = img.toJPEG(JPEG_QUALITY)
+    const bitmap = img.getBitmap()
+    let transparent = false
+    for (let i = 3; i < bitmap.length; i += 4) {
+      if (bitmap[i] < 255) {
+        transparent = true
+        break
+      }
+    }
+    const buf = transparent ? img.toPNG() : img.toJPEG(JPEG_QUALITY)
     if (!buf || !buf.length) return null
-    return 'data:image/jpeg;base64,' + buf.toString('base64')
+    return (transparent ? 'data:image/png;base64,' : 'data:image/jpeg;base64,') + buf.toString('base64')
   } catch {
     return null
   }
@@ -122,7 +131,8 @@ export async function getThumbnail(filePath: string, size?: number): Promise<str
   const task = (async (): Promise<string | null> => {
     await acquire()
     try {
-      const dataUrl = (await createViaSystem(filePath, target)) || createViaResize(filePath, target)
+      const png = path.extname(filePath).toLowerCase() === '.png'
+      const dataUrl = (png ? createViaResize(filePath, target) : await createViaSystem(filePath, target)) || createViaResize(filePath, target)
       if (dataUrl) {
         cache.set(key, { stamp, dataUrl })
         while (cache.size > CACHE_LIMIT) {

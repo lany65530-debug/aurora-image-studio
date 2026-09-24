@@ -29,8 +29,7 @@
 }
 .settings-entry-btn:hover { background: var(--surface-2); color: var(--ink); }
 .settings-entry-btn svg { flex-shrink: 0; }
-[data-theme='brutal'] .settings-entry-btn { border: 2px solid #000; box-shadow: 2px 2px 0 #000; }
-[data-theme='glass'] .settings-entry-btn {
+[data-theme='frosted'] .settings-entry-btn {
   -webkit-backdrop-filter: var(--panel-blur);
   backdrop-filter: var(--panel-blur);
 }
@@ -225,8 +224,9 @@
 .about-env { margin-top: 3px; font-size: 11.5px; color: var(--ink-faint); word-break: break-all; }
 .about-actions { display: flex; gap: 8px; flex-shrink: 0; }
 
-[data-theme='brutal'] .theme-card,
-[data-theme='brutal'] .about-row,
-[data-theme='brutal'] .seg-control { border: 2px solid #000; }
-[data-theme='brutal'] .theme-card.active { box-shadow: 4px 4px 0 #000; }
-[data-theme='brutal'] .seg-control button.active { background: var(--accent); color: #fff; }
+
+
+@media (max-width: 520px) {
+  .theme-grid { grid-template-columns: minmax(0, 1fr); }
+  .settings-section-title { flex-wrap: wrap; }
+}

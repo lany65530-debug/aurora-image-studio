@@ -3,14 +3,14 @@ import { randomUUID } from 'node:crypto'
 import { IPC } from '../../shared/ipc'
 import { loadSettings } from '../services/settings'
 import { resolveProvider } from '../services/provider'
-import { persistImages } from '../services/download'
+import { isTransparentPng, persistImages } from '../services/download'
 import { renderTemplate, getPath, parseJsonTemplate, isImageModel, joinUrl } from '../common/utils'
 import {
   runChatImages,
   runImageCall,
   runImagesByCount
 } from '../services/image-service'
-import { PROVIDER_PRESETS, resolvePixelSize, mapModelVariant, type ProviderGenerate } from '../config'
+import { PROVIDER_PRESETS, resolvePixelSize, type ProviderGenerate } from '../config'
 import { downloadBuffer, requestJson, throwIfAborted, uploadToHost } from '../common/http'
 import { notify } from '../window-store'
 
@@ -30,11 +30,22 @@ function requireApiKey(provider: { apiKey: string }): { ok: false; error: string
   return null
 }
 
-async function prepareImages(images: Array<{ type: 'url' | 'b64'; value: string }>, baseUrl: string, signal: AbortSignal, emit: Emit) {
+function transparentSize(model: string, size: string, resolution: string): string {
+  if (!/^gpt-image-1(?:\.5)?$/.test(model)) return resolvePixelSize(size, resolution)
+  const dimensions = /^\d+x\d+$/.test(size) ? size.split('x') : size.split(':')
+  const ratio = Number(dimensions[0]) / Number(dimensions[1])
+  return ratio > 1 ? '1536x1024' : ratio < 1 ? '1024x1536' : '1024x1024'
+}
+
+async function prepareImages(images: Array<{ type: 'url' | 'b64'; value: string }>, baseUrl: string, signal: AbortSignal, emit: Emit, transparentBackground = false) {
   const prepared: Array<{ type: 'b64'; value: string }> = []
   for (const image of images) {
     throwIfAborted(signal)
     if (image.type === 'b64' || /^data:/i.test(image.value)) {
+      if (transparentBackground) {
+        const data = image.value.replace(/^data:[^,]*,/, '')
+        if (!isTransparentPng(Buffer.from(data, 'base64'))) throw new Error('接口返回的图片不是含透明像素的 PNG，未保存该批结果。')
+      }
       prepared.push({ type: 'b64', value: image.value })
       continue
     }
@@ -49,6 +60,7 @@ async function prepareImages(images: Array<{ type: 'url' | 'b64'; value: string 
       buffer = await downloadBuffer(url, onProgress, { signal, headers: { Referer: baseUrl } })
     }
     if (!buffer.length) throw new Error('图片下载为空')
+    if (transparentBackground && !isTransparentPng(buffer)) throw new Error('接口返回的图片不是含透明像素的 PNG，未保存该批结果。')
     prepared.push({ type: 'b64', value: buffer.toString('base64') })
   }
   throwIfAborted(signal)
@@ -81,7 +93,7 @@ export function registerImageIpc(): void {
       const vars: Record<string, any> = {
         baseUrl: provider.baseUrl,
         apiKey: provider.apiKey,
-        model: mapModelVariant(params.model || settings.model || (params.engine === 'banana' ? 'nano-banana' : 'gpt-image-2'), params.resolution || '2k', provider),
+        model: params.model || settings.model || (params.engine === 'banana' ? 'nano-banana' : 'gpt-image-2'),
         prompt: params.prompt || '',
         n: params.n || 1,
         size: params.size || '1:1',
@@ -93,8 +105,12 @@ export function registerImageIpc(): void {
       }
 
       const bananaStyle = params.engine === 'banana' || /banana|gemini/i.test(String(vars.model))
+      if (params.transparentBackground) {
+        vars.transparentBackground = true
+        vars.sizePx = transparentSize(vars.model, vars.size, vars.resolution)
+      }
       const images = bananaStyle
-        ? await runChatImages(provider, vars.model, params.prompt, [], emit, aborter.signal, { size: vars.size, resolution: params.resolution || '2k' }, vars.n)
+        ? await runChatImages(provider, vars.model, params.prompt, [], emit, aborter.signal, { size: vars.size, resolution: params.resolution || '2k', transparentBackground: vars.transparentBackground }, vars.n)
         : vars.n > 1
           ? await runImagesByCount(provider, cfg, vars, emit, aborter.signal, vars.n)
           : (await runImageCall(provider, cfg, vars, emit, aborter.signal)).images
@@ -105,7 +121,7 @@ export function registerImageIpc(): void {
       }
 
       emit('saving')
-      const prepared = await prepareImages(images, provider.baseUrl, aborter.signal, emit)
+      const prepared = await prepareImages(images, provider.baseUrl, aborter.signal, emit, vars.transparentBackground)
       const savedImages = await persistImages(prepared, {
         saveDir: params.saveDir || settings.saveDir || '',
         baseUrl: provider.baseUrl,
@@ -114,7 +130,8 @@ export function registerImageIpc(): void {
         size: vars.size,
         resolution: params.resolution || '2k',
         mode: params.mode || 'generate',
-        wsId: params.wsId || ''
+        wsId: params.wsId || '',
+        transparentBackground: vars.transparentBackground
       }, emit)
       throwIfAborted(aborter.signal)
       savedImages.forEach((image, index) => {
@@ -154,7 +171,7 @@ export function registerImageIpc(): void {
         cfg = Object.assign({}, provider.generate, { images: 'url' }) as ProviderGenerate
       }
 
-      const model = mapModelVariant(params.model || settings.model || 'gpt-image-2', params.resolution || '2k', provider)
+      const model = params.model || settings.model || 'gpt-image-2'
       const size = params.size || '1:1'
 
       // nano-banana / gemini 系模型的 /v1/images/edits 仅支持 multipart 文件上传格式
@@ -223,15 +240,16 @@ export function registerImageIpc(): void {
         prompt: params.prompt || '',
         n: params.n || 1,
         size,
-        sizePx: resolvePixelSize(size, params.resolution || '2k'),
+        sizePx: params.transparentBackground ? transparentSize(model, size, params.resolution || '2k') : resolvePixelSize(size, params.resolution || '2k'),
         resolution: params.resolution || '2k',
         group: params.group || '',
         images: refImages,
-        imagesFirst: refImages[0] || ''
+        imagesFirst: refImages[0] || '',
+        transparentBackground: params.transparentBackground === true
       }
 
       const images = params.engine === 'banana'
-        ? await runChatImages(provider, model, params.prompt, refImages, emit, aborter.signal, { size, resolution: params.resolution || '2k' }, params.n || 1)
+        ? await runChatImages(provider, model, params.prompt, refImages, emit, aborter.signal, { size, resolution: params.resolution || '2k', transparentBackground: params.transparentBackground === true }, params.n || 1)
         : (params.n || 1) > 1
           ? await runImagesByCount(provider, cfg, vars, emit, aborter.signal, params.n || 1)
           : (await runImageCall(provider, cfg, vars, emit, aborter.signal)).images
@@ -242,7 +260,7 @@ export function registerImageIpc(): void {
       }
 
       emit('saving')
-      const prepared = await prepareImages(images, provider.baseUrl, aborter.signal, emit)
+      const prepared = await prepareImages(images, provider.baseUrl, aborter.signal, emit, vars.transparentBackground)
       const savedImages = await persistImages(prepared, {
         saveDir: params.saveDir || settings.saveDir || '',
         baseUrl: provider.baseUrl,
@@ -251,7 +269,8 @@ export function registerImageIpc(): void {
         size,
         resolution: params.resolution || '2k',
         mode: params.mode || 'edit',
-        wsId: params.wsId || ''
+        wsId: params.wsId || '',
+        transparentBackground: vars.transparentBackground
       }, emit)
       throwIfAborted(aborter.signal)
       savedImages.forEach((image, index) => {

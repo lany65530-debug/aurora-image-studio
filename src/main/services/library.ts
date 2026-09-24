@@ -61,7 +61,7 @@ export function enqueueLibrary(mutate: (lib: LibraryItem[]) => void): Promise<Li
   const run = libraryQueue.then(() => {
     const lib = loadLibrary()
     mutate(lib)
-    saveLibrary(lib)
+    if (!saveLibrary(lib)) throw new Error('保存图片库失败')
     return lib
   })
   libraryQueue = run.catch(() => {})

@@ -80,7 +80,8 @@ export const api: AuroraApi = {
     get: () => ipcRenderer.invoke(IPC.Library.get),
     delete: (args) => ipcRenderer.invoke(IPC.Library.delete, args),
     clear: () => ipcRenderer.invoke(IPC.Library.clear),
-    thumb: (args) => ipcRenderer.invoke(IPC.Library.thumb, args)
+    thumb: (args) => ipcRenderer.invoke(IPC.Library.thumb, args),
+    fileInfo: (id) => ipcRenderer.invoke(IPC.Library.fileInfo, id)
   },
   editor: {
     import: () => ipcRenderer.invoke(IPC.Editor.import),

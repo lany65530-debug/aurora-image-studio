@@ -44,7 +44,8 @@ export const IPC = {
     get: 'library:get',
     delete: 'library:delete',
     clear: 'library:clear',
-    thumb: 'library:thumb'
+    thumb: 'library:thumb',
+    fileInfo: 'library:fileInfo'
   },
   Novel: {
     list: 'novel:list',

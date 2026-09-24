@@ -31,6 +31,7 @@ export interface ImageWorkspace {
   size: string
   count: number
   resolution: string
+  transparentBackground?: boolean
   createdAt: number
   updatedAt: number
   [key: string]: unknown
@@ -218,6 +219,7 @@ export function makeImageWorkspace(name?: string, icon?: string | null, extra?: 
     size: '1:1',
     count: 1,
     resolution: '2k',
+    transparentBackground: false,
     createdAt: Date.now(),
     updatedAt: Date.now()
   }

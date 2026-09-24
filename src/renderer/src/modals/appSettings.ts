@@ -5,7 +5,7 @@
  * 那边是单个工作区的接口/模型/目录，这边是整个应用的界面与更新行为）。
  *
  * 内容：
- *   · 主题     —— 六套完整设计语言，点击即时生效（无需确认）
+ *   · 主题     —— 六套设计语言，点击即时生效（无需确认）
  *   · 界面     —— 字号 / 密度 / 减少动效
  *   · 更新     —— 自动检查开关 + 版本信息 + 手动检查
  * 复用 overlay 模块统一处理遮罩点击与 Escape 关闭。
@@ -93,7 +93,7 @@ function renderBody(): void {
 
   body.innerHTML = `
     <section class="settings-section">
-      <div class="settings-section-title">主题 <small>六套完整设计语言 · 点击即时生效</small></div>
+      <div class="settings-section-title">主题 <small>六套主题 · 点击即时生效</small></div>
       <div class="theme-grid">${THEME_META.map((m) => themeCard(m, m.id === s.theme)).join('')}</div>
     </section>
 

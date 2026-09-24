@@ -22,7 +22,7 @@ app.disableHardwareAcceleration()
 
 require('./out/main/index.js')
 
-const THEMES = ['aurora', 'terminal', 'paper', 'neu', 'glass', 'brutal']
+const THEMES = ['aurora', 'nocturne', 'botanical', 'frosted', 'ios', 'comic']
 const SHOT_DIR = path.join(__dirname, 'shots-theme')
 const UI_SETTINGS_FILE = path.join(TMP_USER_DATA, 'ui-settings.json')
 
@@ -108,7 +108,7 @@ async function main() {
   const persisted = await until('ui-settings.json 落盘', () => {
     if (!fs.existsSync(UI_SETTINGS_FILE)) return null
     const j = JSON.parse(fs.readFileSync(UI_SETTINGS_FILE, 'utf-8'))
-    return j.theme === 'brutal' && j.fontScale === 'xl' ? j : null
+    return j.theme === 'comic' && j.fontScale === 'xl' ? j : null
   })
   assert.equal(persisted.density, 'compact')
   assert.equal(persisted.reduceMotion, true)

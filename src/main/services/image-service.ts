@@ -17,6 +17,7 @@ export interface ImageVars {
   sizePx?: string
   resolution?: string
   group?: string
+  transparentBackground?: boolean
   images?: string[]
   imagesFirst?: string
   [key: string]: any
@@ -43,11 +44,22 @@ export function buildImageCall(provider: ResolvedProvider, cfg: ProviderGenerate
     ? parseJsonTemplate(cfg.headers, vars)
     : (cfg.headers || parseJsonTemplate(provider.headers, vars) || {})
   let body = null
+  let form = cfg.form ? renderForm(cfg.form, vars) : null
   if (cfg.body) body = parseJsonTemplate(cfg.body, vars)
+  if (vars.transparentBackground) {
+    if (form) {
+      form = { ...form, background: 'transparent', output_format: 'png' }
+    } else if (body && typeof body === 'object' && !Array.isArray(body)) {
+      body.background = 'transparent'
+      body.output_format = 'png'
+    } else {
+      throw new Error('当前接口没有可写入透明背景参数的请求体')
+    }
+  }
   return {
     headers,
     body,
-    form: cfg.form ? renderForm(cfg.form, vars) : null,
+    form,
     path: renderTemplate(cfg.path, vars),
     method: cfg.method || 'POST'
   }
@@ -279,6 +291,7 @@ export async function runImagesByCount(provider: ResolvedProvider, cfg: Provider
 export interface ChatImageOpts {
   size?: string
   resolution?: string
+  transparentBackground?: boolean
 }
 
 export async function runChatImageCall(provider: ResolvedProvider, model: string, prompt: string, refImages: string[], emit: ImageEmit | undefined, signal: AbortSignal | undefined, opts: ChatImageOpts): Promise<Array<{ type: 'url' | 'b64'; value: string }>> {
@@ -324,6 +337,10 @@ export async function runChatImageCall(provider: ResolvedProvider, model: string
   // 若被拒绝则去掉这两个参数用最小请求体重试一次（提示词中的比例描述仍兜底）。
   const doRequest = (messages: any[], withSizeParams: boolean) => {
     const body: any = { model, messages }
+    if (opts.transparentBackground) {
+      body.background = 'transparent'
+      body.output_format = 'png'
+    }
     if (withSizeParams) {
       body.size = sizePx // 部分中转站识别 top-level size
       body.image_config = { size: sizePx } // Gemini 原生风格参数

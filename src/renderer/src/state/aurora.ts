@@ -91,7 +91,8 @@ export const library = {
   delete: (a: DeleteLibraryArgs) => raw.library.delete(a),
   clear: () => raw.library.clear(),
   /** 取网格卡片缩略图（主进程生成并缓存），避免解码原图卡顿。 */
-  thumb: (a: { path: string; size?: number }) => raw.library.thumb(a)
+  thumb: (a: { path: string; size?: number }) => raw.library.thumb(a),
+  fileInfo: (id: string) => raw.library.fileInfo(id)
 }
 
 /* ===== 剪辑工作区（媒体导入 / 读取 / 导出） ===== */

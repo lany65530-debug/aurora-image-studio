@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import { nativeImage } from 'electron'
 import { downloadBuffer } from '../common/http'
 import { ensureDir, sanitizeName } from '../common/utils'
 import { enqueueLibrary } from './library'
@@ -20,9 +21,21 @@ export interface PersistMeta {
   resolution?: string
   mode?: string
   wsId?: string
+  transparentBackground?: boolean
 }
 
 export type PersistEmit = (phase: string, data?: Record<string, unknown>) => void
+
+export function isTransparentPng(buffer: Buffer): boolean {
+  if (buffer.length < 24 || !buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) return false
+  const image = nativeImage.createFromBuffer(buffer)
+  if (image.isEmpty()) return false
+  const bitmap = image.getBitmap()
+  for (let i = 3; i < bitmap.length; i += 4) {
+    if (bitmap[i] < 255) return true
+  }
+  return false
+}
 
 /**
  * 持久化一组原始图片到磁盘 + 图片库，返回入库条目。
@@ -90,9 +103,20 @@ export function persistImages(rawImages: RawImage[], meta: PersistMeta, emit?: P
           savedPath = filePath
         } catch (e) {
           savedPath = ''
+          if (meta.transparentBackground) {
+            try { fs.unlinkSync(filePath) } catch {}
+          }
         }
       }
 
+      if (meta.transparentBackground && !savedPath) {
+        for (const entry of collected) {
+          if (entry.filePath) {
+            try { fs.unlinkSync(entry.filePath) } catch {}
+          }
+        }
+        throw new Error('透明 PNG 保存失败，未将结果加入作品集。')
+      }
       const entry = {
         id: `${stamp}-${i}-${uniq}`,
         prompt: meta.prompt,
@@ -101,6 +125,7 @@ export function persistImages(rawImages: RawImage[], meta: PersistMeta, emit?: P
         resolution: meta.resolution || '',
         mode: meta.mode || 'generate',
         wsId: meta.wsId || '',
+        transparentBackground: meta.transparentBackground === true,
         filePath: savedPath,
         fileUrl: savedPath ? 'file:///' + savedPath.replace(/\\/g, '/') : img.value,
         remoteUrl: type === 'url' ? img.value : '',
@@ -110,9 +135,20 @@ export function persistImages(rawImages: RawImage[], meta: PersistMeta, emit?: P
       savedImages.push(entry)
     }
     // 入库统一走队列：每次重新读取最新库再前置插入，避免并发批次相互覆盖（根因1）
-    await enqueueLibrary((lib) => {
-      lib.unshift(...collected)
-    })
+    try {
+      await enqueueLibrary((lib) => {
+        lib.unshift(...collected)
+      })
+    } catch (err) {
+      if (meta.transparentBackground) {
+        for (const entry of collected) {
+          if (entry.filePath) {
+            try { fs.unlinkSync(entry.filePath) } catch {}
+          }
+        }
+      }
+      throw err
+    }
     return savedImages
   })()
 }

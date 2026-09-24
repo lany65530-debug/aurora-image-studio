@@ -59,15 +59,12 @@ export interface UpdaterStatus {
 /* ===== 界面设置（主题 / 字号 / 密度 / 动效） ===== */
 
 /**
- * 六套主题，每套是一套独立的视觉语言（不是换色）：
+ * 六套主题，每套是一套独立的视觉语言。
  *  - aurora   极简光感：白底、中性灰阶、柔和投影、圆润系统字
- *  - terminal 终端磷光：近黑底 + 荧光绿、等宽字、直角、扫描线、发光描边
- *  - paper    纸上书卷：米黄纸感、衬线字、发丝线分隔、零投影、编辑排版
- *  - neu      柔和浮雕：与底色同色的双向柔影、大圆角、无描边、低对比
- *  - glass    玻璃拟态：彩色渐变底 + 毛玻璃、半透明描边、光晕
- *  - brutal   粗野主义：高对比、粗黑描边、硬阴影（零模糊）、高饱和撞色
+ *  - nocturne 夜幕放映：深蓝黑幕、暖金焦点、收敛的影院式层次
+ *  - botanical 植物画室：暖白画纸、深松绿、编辑式排版
  */
-export const UI_THEMES = ['aurora', 'terminal', 'paper', 'neu', 'glass', 'brutal'] as const
+export const UI_THEMES = ['aurora', 'nocturne', 'botanical', 'frosted', 'ios', 'comic'] as const
 export type UiTheme = (typeof UI_THEMES)[number]
 
 /** 主题的展示元信息（设置界面用）。 */
@@ -109,34 +106,34 @@ export const THEME_META: ThemeMeta[] = [
     swatch: ['#ffffff', '#f4f4f4', '#0d0d0d', '#0a7d43']
   },
   {
-    id: 'terminal',
-    name: '终端磷光',
-    desc: '近黑底 + 荧光绿 · 全等宽字 · 直角发光描边 · 扫描线',
-    swatch: ['#05080a', '#0a1210', '#00ff88', '#b8ffd0']
+    id: 'nocturne',
+    name: '夜幕放映',
+    desc: '深蓝黑幕 · 暖金焦点 · 收敛的影院式层次',
+    swatch: ['#10151c', '#1d2731', '#e1b977', '#91a9b6']
   },
   {
-    id: 'paper',
-    name: '纸上书卷',
-    desc: '米黄纸感 · 衬线正文 · 发丝线分隔 · 零投影的排版语言',
-    swatch: ['#f6f1e7', '#fbf8f1', '#9c3d2e', '#2b2620']
+    id: 'botanical',
+    name: '植物画室',
+    desc: '暖白画纸 · 深松绿 · 轻盈的编辑式排版',
+    swatch: ['#f4f2e9', '#fffef9', '#29564b', '#cc885f']
   },
   {
-    id: 'neu',
-    name: '柔和浮雕',
-    desc: '同色双向柔影 · 大圆角 · 无描边 · 低对比的触摸感',
-    swatch: ['#e8ecf2', '#e8ecf2', '#5b7cfa', '#4a5568']
+    id: 'frosted',
+    name: '雾光玻璃',
+    desc: '冰蓝渐变 · 半透明叠层 · 柔焦折射',
+    swatch: ['#dce9f3', '#eaf4fa', '#345e92', '#c1a5d8']
   },
   {
-    id: 'glass',
-    name: '玻璃拟态',
-    desc: '彩色渐变底 · 毛玻璃模糊面板 · 半透明描边与光晕',
-    swatch: ['#6a5cff', '#ff5ea8', '#ffffff', '#35d0ba']
+    id: 'ios',
+    name: 'iOS 灵动',
+    desc: '分组面板 · 系统蓝 · 精致圆润控件',
+    swatch: ['#f2f2f7', '#ffffff', '#007aff', '#d1d1d6']
   },
   {
-    id: 'brutal',
-    name: '粗野主义',
-    desc: '粗黑描边 · 硬阴影零模糊 · 高饱和撞色 · 无圆角',
-    swatch: ['#fffdf5', '#ffffff', '#ffd400', '#2b5dff']
+    id: 'comic',
+    name: '漫画卡片',
+    desc: '奶油底色 · 粗线框 · 活泼错位卡片',
+    swatch: ['#fff4d8', '#fffdf6', '#ec6047', '#496bdb']
   }
 ]
 
@@ -269,6 +266,7 @@ export interface GenerateImageParams {
   n?: number
   size?: string
   resolution?: string
+  transparentBackground?: boolean
   group?: string
   saveDir?: string
 }

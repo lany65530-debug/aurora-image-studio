@@ -130,8 +130,8 @@ export const PROVIDER_PRESETS: Record<string, ProviderPreset> = {
     edit: {
       method: 'POST',
       path: '/v1/images/edits',
-      images: 'b64',
-      body: '{"model":{{model:json}},"prompt":{{prompt:json}},"n":{{n}},"size":{{sizePx:json}}}',
+      images: 'file',
+      form: { model: '{{model}}', prompt: '{{prompt}}', n: '{{n}}', size: '{{sizePx}}' },
       imagesPath: 'data',
       urlField: 'url',
       b64Field: 'b64_json',
@@ -166,42 +166,6 @@ export const PROVIDER_PRESETS: Record<string, ProviderPreset> = {
     edit: {
       method: 'POST',
       path: '/v1/images/edits',
-      images: 'url',
-      body: '{"model":{{model:json}},"prompt":{{prompt:json}},"n":{{n}},"size":{{sizePx:json}},"images":{{images:imageobj}}}',
-      imagesPath: 'data',
-      urlField: 'url',
-      b64Field: 'b64_json',
-      binary: false,
-      async: { enabled: false }
-    }
-  },
-  dragon3api: {
-    name: 'DragonAPI (gpt-image-2)',
-    baseUrl: 'https://newapi.dragon3api.com',
-    headers: '{"Authorization":"Bearer {{apiKey}}"}',
-    models: { method: 'GET', path: '/v1/models', listPath: 'data', idField: 'id', ownerField: 'owned_by' },
-    groups: {
-      method: 'GET',
-      path: '/api/pricing',
-      groupsPath: 'data.group_ratio',
-      groupNamePath: 'data.usable_group',
-      modelGroupsPath: 'data.data',
-      modelGroupIdField: 'model_name',
-      modelGroupListField: 'enable_groups'
-    },
-    generate: {
-      method: 'POST',
-      path: '/v1/images/generations',
-      body: '{"model":{{model:json}},"prompt":{{prompt:json}},"n":{{n}},"size":{{sizePx:json}}}',
-      imagesPath: 'data',
-      urlField: 'url',
-      b64Field: 'b64_json',
-      binary: false,
-      async: { enabled: false }
-    },
-    edit: {
-      method: 'POST',
-      path: '/v1/images/edits',
       images: 'file',
       form: { model: '{{model}}', prompt: '{{prompt}}', n: '{{n}}', size: '{{sizePx}}' },
       imagesPath: 'data',
@@ -210,74 +174,6 @@ export const PROVIDER_PRESETS: Record<string, ProviderPreset> = {
       binary: false,
       async: { enabled: false }
     }
-  },
-  lingwu: {
-    name: '灵悟AI (异步媒体管线)',
-    baseUrl: 'https://lingwuai.ai',
-    headers: '{"Authorization":"Bearer {{apiKey}}"}',
-    models: { method: 'GET', path: '/v1/models', listPath: 'data', idField: 'id', ownerField: 'owned_by' },
-    groups: {
-      method: 'GET',
-      path: '/api/pricing',
-      groupsPath: 'data.group_ratio',
-      groupNamePath: 'data.usable_group',
-      modelGroupsPath: 'data.data',
-      modelGroupIdField: 'model_name',
-      modelGroupListField: 'enable_groups'
-    },
-    generate: {
-      method: 'POST',
-      path: '/v1/images/generations',
-      body: '{"model":{{model:json}},"prompt":{{prompt:json}},"n":{{n}},"size":{{sizePx:json}}}',
-      imagesPath: 'data',
-      urlField: 'url',
-      b64Field: 'b64_json',
-      binary: false,
-      async: { enabled: false }
-    },
-    edit: {
-      method: 'POST',
-      path: '/v1/media/generate',
-      images: 'url',
-      body: '{"model":"{{model}}","prompt":{{prompt:json}},"params":{"images":{{images:jsonraw}},"size":{{sizePx:json}},"n":{{n}},"response_format":"url"},"group":{{group:json}}}',
-      imagesPath: 'data',
-      urlField: 'url',
-      b64Field: 'b64_json',
-      binary: false,
-      async: {
-        enabled: true,
-        taskIdPath: 'task_id',
-        statusPath: '/v1/media/status',
-        taskIdQuery: 'task_id',
-        statePath: 'state',
-        doneStates: 'success',
-        failStates: 'failed',
-        resultPath: 'result_url',
-        resultListPath: 'result_urls',
-        pollIntervalMs: 4000,
-        timeoutMs: 480000
-      }
-    }
-  },
-  stability: {
-    name: 'Stability AI (二进制返回)',
-    baseUrl: 'https://api.stability.ai',
-    headers: '{"Authorization":"Bearer {{apiKey}}","Accept":"image/*"}',
-    models: null,
-    groups: null,
-    generate: {
-      method: 'POST',
-      path: '/v2beta/stable-image/generate/core',
-      headers: '{"Authorization":"Bearer {{apiKey}}","Accept":"image/*","Content-Type":"multipart/form-data"}',
-      body: null,
-      form: { prompt: '{{prompt}}', aspect_ratio: '{{size}}', output_format: 'png' },
-      imagesPath: null,
-      urlField: '',
-      b64Field: '',
-      binary: true,
-      async: { enabled: false }
-    },
-    edit: null
   },
   custom: {
     name: '完全自定义',
@@ -340,24 +236,8 @@ export function resolvePresetId(stored: unknown, override: unknown, baseUrl: unk
   let id = p
   if (id === 'auto') {
     const u = String(baseUrl || '').toLowerCase()
-    if (u.includes('openai.com')) id = 'openai'
-    else if (u.includes('dragon3api')) id = 'dragon3api'
-    else if (u.includes('lingwu')) id = 'lingwu'
-    else if (u.includes('stability')) id = 'stability'
-    else id = 'openai_compat'
+    id = u.includes('api.openai.com') ? 'openai' : 'openai_compat'
   }
   if (typeof id !== 'string' || !Object.hasOwn(PROVIDER_PRESETS, id)) id = 'openai_compat'
   return id
-}
-
-/**
- * DragonAPI 模型变体自动映射。
- * 实测：DragonAPI 平台基础模型 gpt-image-2 会忽略 size 参数，无论什么比例都固定输出 1254x1254 方图；
- * 而 gpt-image-2-2k / gpt-image-2-4k 变体会精确遵循请求的像素尺寸。
- * 因此按分辨率档位自动映射为对应变体，保证输出比例与用户选择一致。
- */
-export function mapModelVariant(model: unknown, resolution: unknown, provider: any): string {
-  if (!provider || !/dragon3api/i.test(provider.baseUrl || '')) return String(model)
-  if (model !== 'gpt-image-2') return String(model)
-  return resolution === '4k' ? 'gpt-image-2-4k' : 'gpt-image-2-2k'
 }

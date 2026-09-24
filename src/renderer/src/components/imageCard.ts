@@ -90,6 +90,7 @@ export function buildCard(entry: any, shapeClass: string, index: number, opts: C
   const src = entry.fileUrl || entry.remoteUrl
   const card = document.createElement('div')
   card.className = 'img-card ' + shapeClass
+  if (entry.transparentBackground === true) card.classList.add('transparent-image')
   // 只给前几屏卡片做入场动画；后面的卡片延迟归零，避免大量动画同时排队
   card.style.animationDelay = index < 12 ? `${index * 0.025}s` : '0s'
 
@@ -99,7 +100,7 @@ export function buildCard(entry: any, shapeClass: string, index: number, opts: C
   image.decoding = 'async'
   image.draggable = false
   cardImageInfo.set(image, { fallback: src || '', filePath: entry.filePath ? String(entry.filePath) : '' })
-  image.addEventListener('click', () => openLightbox(src))
+  image.addEventListener('click', () => openLightbox(src, entry.transparentBackground === true, entry))
 
   const overlay = document.createElement('div')
   overlay.className = 'img-overlay'
@@ -113,7 +114,7 @@ export function buildCard(entry: any, shapeClass: string, index: number, opts: C
 
   const zoom = iconBtn(
     '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4M11 8v6M8 11h6" stroke-linecap="round"/></svg>',
-    () => openLightbox(src)
+    () => openLightbox(src, entry.transparentBackground === true, entry)
   )
   // 一键引用提示词
   const quote = iconBtn(

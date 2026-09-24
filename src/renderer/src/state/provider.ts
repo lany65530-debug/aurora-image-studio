@@ -9,12 +9,7 @@ import type { Workspace } from './store'
 
 /** 根据接口地址自动判断接口类型。 */
 export function detectPreset(baseUrl: string): string {
-  const u = String(baseUrl || '').toLowerCase()
-  if (u.includes('openai.com')) return 'openai'
-  if (u.includes('dragon3api')) return 'dragon3api'
-  if (u.includes('lingwu')) return 'lingwu'
-  if (u.includes('stability')) return 'stability'
-  return 'openai_compat'
+  return String(baseUrl || '').toLowerCase().includes('api.openai.com') ? 'openai' : 'openai_compat'
 }
 
 /** 由工作区配置构造 provider（用于按次覆盖主进程的默认接口）。 */
